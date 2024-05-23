@@ -16,7 +16,7 @@ def hacking_game():
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 600
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Jeu de Hacking")
+    pygame.display.set_caption("Hacking's Game")
 
     # Couleurs
     BLACK = (0, 0, 0)
@@ -220,25 +220,25 @@ Rules:\n
 \n
 Good luck!\n"""
 
-
+tools=[]
 
 
 
 
 def layout1():
     money=0
-    tab_layout1 = [[sg.Text("Choose your Mission:"),sg.Listbox(["Mission 1", "Mission 2", "Mission Proposal 3", "Mission Proposal 4", "Mission Proposal 5"],size=(300, 50),enable_events=True,key='-LIST-')]]
+    tab_layout1 = [[sg.Text("Choose your Mission:"),sg.Listbox(["Mission 1"],size=(300, 50),enable_events=True,key='LIST')]]
     tab_layout2 = [[sg.Button('Team Management'),]]
     layout = [[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
     #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
+    #rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )
     layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2)]])])
     
 
-    window = sg.Window('Generated Layouts', layout, finalize=True)
-    #rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )  
-    sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
-    sleep(0.2)
-    sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Mission 1] button for a little check",no_titlebar=True,font="Default 20")
+    window = sg.Window('Generated Layouts', layout, finalize=True)  
+    #sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
+    #sleep(0.2)
+    #sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Mission 1] button for a little check",no_titlebar=True,font="Default 20")
     event, values = window.read()
     
     #print(event, values)
@@ -252,8 +252,8 @@ def layout1():
             print(money)
         if event in (sg.WIN_CLOSED, '-EXIT-'):         # If the user exits
             break
-        if event == '-LIST-' and len(values['-LIST-']):
-            if "Mission 1" in values['-LIST-']:
+        if event == 'LIST' and len(values['LIST']):
+            if "Mission 1" in values['LIST']:
                 if sg.popup_yes_no("You have selected Mission 1.\nFrom: Your Sensei\nWe need to check that you are a reasonable guy and not a dumbass.\nReward: 1000.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                     if sg.popup_yes_no("You chose this mission, now answer the question to complete it.\nThis is the question:\nIf you enter a stranger's pc do you know the password?",no_titlebar=True)=="Yes":
                         sg.popup("You lost, it is protected you need a tool to know it",no_titlebar=True)
@@ -261,16 +261,17 @@ def layout1():
                     else:
                         sg.popup("Few... we were right,you are a trustable person.The money will be transfered in your account.",no_titlebar=True)
                         money+=1000
+                        tools.append("Password Cracker")
                         window['pippo'].update(f"Money Counter:{money}")
+                        window.extend_layout(window['LIST'], [([sg.Listbox(("Sigma", "Mission 3", "Mission 4", "Mission 5"),size=(300, 50),enable_events=True,key='LIST')])])
                         sg.WIN_CLOSED==None
-                        sleep(2)
-                        sg.popup("Now let's go try your first true mission.\nHead to  [Mission 2]",no_titlebar=True,font="Default 20")
+                        sg.popup("Now let's go try your first true mission.\nHead to  [Sigma]",no_titlebar=True,font="Default 20")
 
                 else:
                     sg.popup("Why are you here then duh.",no_titlebar=True)
                     sg.WIN_CLOSED==None
-            if "Mission 2" in values['-LIST-']:
-                if sg.popup_yes_no("You have selected Mission 2.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker, Surveillance Bypass\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+            if "Sigma" in values['LIST']:
+                if sg.popup_yes_no("You have selected Sigma.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker, Surveillance Bypass\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                     sg.popup(f"{Hack_Rules}",no_titlebar=True)
                     result = hacking_game()
                     if result==1:
