@@ -263,15 +263,20 @@ def layout1():
                         money+=1000
                         tools.append("Password Cracker")
                         window['pippo'].update(f"Money Counter:{money}")
-                        window.extend_layout(window['LIST'], [([sg.Listbox(("Sigma", "Mission 3", "Mission 4", "Mission 5"),size=(300, 50),enable_events=True,key='LIST')])])
+                        window.extend_layout(window['LIST'], [([sg.Listbox(("Sigma's Entreprises", "Mission 3", "Mission 4", "Mission 5"),size=(300, 50),enable_events=True,key='Mission list')])])
+                        event, values = window.read()
+                        window['LIST'].update(values["LIST"])
+                        Pswexists = "Password Cracker"  in tools
                         sg.WIN_CLOSED==None
-                        sg.popup("Now let's go try your first true mission.\nHead to  [Sigma]",no_titlebar=True,font="Default 20")
+                        sg.popup("Now let's go try your first true mission.\nHead to  [Sigma's Entreprises]",no_titlebar=True,font="Default 20")
+                        
+                        
 
                 else:
                     sg.popup("Why are you here then duh.",no_titlebar=True)
                     sg.WIN_CLOSED==None
-            if "Sigma" in values['LIST']:
-                if sg.popup_yes_no("You have selected Sigma.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker, Surveillance Bypass\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+            if "Sigma's Entreprises" in values['Mission list'] and Pswexists==True:
+                if sg.popup_yes_no("You have selected the mail from Sigma's Entreprises.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                     sg.popup(f"{Hack_Rules}",no_titlebar=True)
                     result = hacking_game()
                     if result==1:
