@@ -32,7 +32,7 @@ while True:
         break
     if event == '-TABLE-':
         selected_row_index = values['-TABLE-'][0]  # Get the index of the selected row
-        selected_row = data[selected_row_index]  # Get the data of the selected row
+        selected_tools = data[selected_row_index][0]  # Get the data of the selected row and the first column
         tools.append(selected_row)  # Add the selected row to the tools list
         window['-TOOLS-'].update(tools)  # Update the Text element to show selected tools
         print(tools)

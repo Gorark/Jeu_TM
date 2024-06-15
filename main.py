@@ -332,19 +332,24 @@ def password_game():
 
 
 
-tools=[]
+
 
 def layout1():
+    rawtools=[]
     money=0
     mission1won=0
+    tools = list(set(rawtools))
+
+    marketdata = ["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["IP Probe","Probe the ip",10000]
+    
     tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(["Mission 1"],size=(300, 50),enable_events=True,key='LIST')]]
     tab_layout2 = [[sg.Button('Team Management'),]]
-    tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table([["Password Cracker"], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. "], ["Firewall Bypass "], ["IP Probe "]], headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',key='Market')]]
-    
+    tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')]]
+    tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
     layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
     #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
     #rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )
-    layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3)]])])
+    layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3),sg.Tab("User", tab_layout4)]])])
     
 
     window = sg.Window('Generated Layouts', layout, finalize=True)  
@@ -364,21 +369,38 @@ def layout1():
             print(money)
         if event in (sg.WIN_CLOSED, '-EXIT-'):         # If the user exits
             break
-        if event == 'Market' and len(values['Market']):
-            if "Password Cracker" in values['Market']:
-                if sg.popup_yes_no("Do you want to buy the Password Cracker for 1000.-?",no_titlebar=True)=="Yes":
-                    if money >= 1000:
-                        money-=1000
-                        tools.append("Password Cracker")
-                        Pswexists = "Password Cracker"  in tools
+        if event == 'Market':
+            selected_row_index = values['Market'][0]  # Get the index of the selected row +verif documentation
+            selected_tool = marketdata[selected_row_index][0]  # Get the data of the selected row and the first column
+            selected_price = marketdata[selected_row_index][-1]
+            if selected_price > money:
+                sg.popup("You don't have enough money to buy that.",no_titlebar=True)
+            if selected_price <= money:
+                if sg.popup_yes_no(f"Do you want to buy the {selected_tool}  for {selected_price}.-?",no_titlebar=True)=="Yes":
+                        money-=selected_price
+                        rawtools.append(selected_tool)
+                        tools = list(set(rawtools))
+                        window['-TOOLS-'].update(f"Tools Owned: {tools}")
+                        window['pippo'].update(f"Money Counter:{money}")
+                        Pswexists = "Password Cracker"  in rawtools
+                        Decexists = "Decrypter" in rawtools
+                        Fireexists = "Firewall Bypass"  in rawtools
+                        IPexists = "IP Probe"  in rawtools
                         if Pswexists==True:
-                           sg.popup("You successfully bought the Password Cracker",no_titlebar=True)                      
-                    else:
-                        sg.popup("You cannot buy that.",no_titlebar=True)
-
-                    
+                           sg.popup("You successfully bought the Password Cracker",no_titlebar=True)
+                        if Decexists==True:
+                           sg.popup("You successfully bought the Decrypter",no_titlebar=True)
+                        if Fireexists==True:
+                           sg.popup("You successfully bought the Firewall Bypass",no_titlebar=True)
+                        if IPexists==True:
+                           sg.popup("You successfully bought the IP Probe",no_titlebar=True)
                 else:
-                    sg.WIN_CLOSED==None
+                    sg.WIN_CLOSED==None 
+
+            # rawtools.append(selected_tool)  # Add the selected row to the tools list
+            # window['-TOOLS-'].update(tools)  # Update the Text element to show selected tools
+            # tools = list(set(rawtools))
+            # print(selected_price)
                 
         if event == 'LIST' and len(values['LIST']):
             if "Mission 1" in values['LIST']:
