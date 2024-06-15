@@ -6,6 +6,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import random
 import time
+import string
 
 # Fonction principale du jeu de hacking
 def hacking_game():
@@ -198,6 +199,7 @@ def hacking_game():
 
     pygame.quit()
     return game_result
+
 Hack_Rules = """Game Controls and Rules\n
 Controls:\n
 - Move Up: W\n
@@ -215,24 +217,134 @@ Rules:\n
 3. Win Condition: Reach a score of 10 within the time limit.\n
 4. Lose Condition:\n
    - If time runs out before reaching 10, you lose.\n
-   - Failed hack shows "Hacking Failed!" message.\n
-   - Timer at top right shows remaining time. If time runs out, "Time's up! You lost." message is displayed.\n
-\n
 Good luck!\n"""
+
+def password_game():
+    pygame.init()
+    # Configuration de la fenêtre
+    largeur, hauteur = 800, 600
+    fenetre = pygame.display.set_mode((largeur, hauteur))
+    pygame.display.set_caption("Hacking Game")
+
+    # Couleurs
+    BLANC = (255, 255, 255)
+    NOIR = (0, 0, 0)
+    ROUGE = (255, 0, 0)
+    VERT = (0, 255, 0)
+    BLEU = (0, 0, 255)
+    GRIS = (200, 200, 200)
+
+    # Police de caractères
+    police = pygame.font.SysFont('Arial', 36)
+    police_titre = pygame.font.SysFont('Arial', 24, bold=True)
+
+    # Génération d'un mot de passe aléatoire
+    def generer_mot_de_passe(longueur=6):
+        caracteres = string.ascii_letters + string.digits
+        return ''.join(random.choice(caracteres) for _ in range(longueur))
+
+    # Fonction de la barre de progression
+    def progress_bar():
+        for i in range(101):
+            fenetre.fill(NOIR)
+            largeur_barre = int(i * 2)
+            pygame.draw.rect(fenetre, BLEU, (150, 250, largeur_barre, 50))
+            texte = police.render(f"Revealing password: {i}%", True, BLANC)
+            fenetre.blit(texte, (400 - texte.get_width() // 2, 320))
+            pygame.display.flip()
+            pygame.time.delay(30)
+
+    # Fonction du bouton Password Breaker
+    def password_breaker_button():
+        progress_bar()
+        return f"The password is: {mot_de_passe}"
+
+    # Fonction pour afficher un écran de fin
+    def afficher_ecran_fin(message_final):
+        fenetre.fill(NOIR)
+        texte_final = police_titre.render(message_final, True, VERT if "Granted" in message_final else ROUGE)
+        fenetre.blit(texte_final, (largeur // 2 - texte_final.get_width() // 2, hauteur // 2 - texte_final.get_height() // 2))
+        pygame.display.flip()
+        pygame.time.delay(3000)
+
+    mot_de_passe = generer_mot_de_passe()
+    attempt = ""
+    message = ""
+    attempt_count = 0
+    max_attempts = 3
+    horloge = pygame.time.Clock()
+    win = 0  # 0: Perdu, 1: Gagné
+
+    running = True
+    game_over = False
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+                x, y = event.pos
+                if 600 <= x <= 780 and 500 <= y <= 580:
+                    message = password_breaker_button()
+            elif event.type == pygame.KEYDOWN and not game_over:
+                if event.key == pygame.K_RETURN:
+                    if attempt == mot_de_passe:
+                        message = "Access Granted. You Win!"
+                        win = 1
+                        game_over = True
+                    else:
+                        message = "Access Denied"
+                        attempt_count += 1
+                        if attempt_count >= max_attempts:
+                            message = f"Access Denied. You Lost. The password was: {mot_de_passe}"
+                            win = 0
+                            game_over = True
+                        attempt = ""
+                elif event.key == pygame.K_BACKSPACE:
+                    attempt = attempt[:-1]
+                else:
+                    attempt += event.unicode
+
+        fenetre.fill(NOIR)
+        text_attempt = police.render(f"Attempt: {attempt}", True, BLANC)
+        text_message = police.render(message, True, ROUGE if message.startswith("Access Denied") else VERT)
+        text_attempts_left = police.render(f"Attempts left: {max_attempts - attempt_count}", True, BLANC)
+        title = police_titre.render("Password Breaker", True, VERT)
+
+        fenetre.blit(text_attempt, (20, 20))
+        fenetre.blit(text_attempts_left, (20, 60))
+        if message:
+            fenetre.blit(text_message, (20, 100))
+        pygame.draw.rect(fenetre, BLANC, (600, 500, 180, 80))
+        pygame.draw.rect(fenetre, NOIR, (605, 505, 170, 70))
+        title_rect = title.get_rect(center=(605 + 85, 505 + 35))
+        fenetre.blit(title, title_rect)
+
+        pygame.display.flip()
+        horloge.tick(30)
+
+        if game_over:
+            afficher_ecran_fin(message)
+            running = False
+
+    pygame.quit()
+    return win
+
+
 
 tools=[]
 
-
-
-
 def layout1():
     money=0
-    tab_layout1 = [[sg.Text("Choose your Mission:"),sg.Listbox(["Mission 1"],size=(300, 50),enable_events=True,key='LIST')]]
+    mission1won=0
+    tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(["Mission 1"],size=(300, 50),enable_events=True,key='LIST')]]
     tab_layout2 = [[sg.Button('Team Management'),]]
-    layout = [[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
+    tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table([["Password Cracker"], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. "], ["Firewall Bypass "], ["IP Probe "]], headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',key='Market')]]
+    
+    layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
     #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
     #rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )
-    layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2)]])])
+    layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3)]])])
     
 
     window = sg.Window('Generated Layouts', layout, finalize=True)  
@@ -244,7 +356,7 @@ def layout1():
     #print(event, values)
     while True:                             # Event Loop
         event, values = window.read()       # type: str, dict
-        #print(event)
+        print(event,values)
         if event=="Free money":
             money+=300
             window['pippo'].update(f"Money Counter:{money}")
@@ -252,30 +364,45 @@ def layout1():
             print(money)
         if event in (sg.WIN_CLOSED, '-EXIT-'):         # If the user exits
             break
+        if event == 'Market' and len(values['Market']):
+            if "Password Cracker" in values['Market']:
+                if sg.popup_yes_no("Do you want to buy the Password Cracker for 1000.-?",no_titlebar=True)=="Yes":
+                    if money >= 1000:
+                        money-=1000
+                        tools.append("Password Cracker")
+                        Pswexists = "Password Cracker"  in tools
+                        if Pswexists==True:
+                           sg.popup("You successfully bought the Password Cracker",no_titlebar=True)                      
+                    else:
+                        sg.popup("You cannot buy that.",no_titlebar=True)
+
+                    
+                else:
+                    sg.WIN_CLOSED==None
+                
         if event == 'LIST' and len(values['LIST']):
             if "Mission 1" in values['LIST']:
-                if sg.popup_yes_no("You have selected Mission 1.\nFrom: Your Sensei\nWe need to check that you are a reasonable guy and not a dumbass.\nReward: 1000.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
-                    if sg.popup_yes_no("You chose this mission, now answer the question to complete it.\nThis is the question:\nIf you enter a stranger's pc do you know the password?",no_titlebar=True)=="Yes":
-                        sg.popup("You lost, it is protected you need a tool to know it",no_titlebar=True)
-                        sg.WIN_CLOSED==None
+                while mission1won != 1:
+                    if sg.popup_yes_no("You have selected Mission 1.\nFrom: Your Sensei\nWe need to check that you are a reasonable guy and not a dumbass.\nReward: 1000.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+                        if sg.popup_yes_no("You chose this mission, now answer the question to complete it.\nThis is the question:\nIf you enter a stranger's pc do you know the password?",no_titlebar=True)=="Yes":
+                            sg.popup("You lost, it is protected you need a tool to know it",no_titlebar=True)
+                            sg.WIN_CLOSED==None
+                        else:
+                            sg.popup("Few... we were right,you are a trustable person.The money will be transfered in your account.",no_titlebar=True)
+                            money+=1000
+                            window['pippo'].update(f"Money Counter:{money}")
+                            mission1won=1
+                            window.extend_layout(window['LIST'], [([sg.Listbox(("Sigma's Entreprises", "Mission 3", "Mission 4", "Mission 5"),size=(300, 50),enable_events=True,key='Mission list')])])
+                            event, values = window.read()
+                            window['LIST'].update(values["LIST"])
+                            sg.WIN_CLOSED==None
+                            sg.popup("Now let's go try your first true mission.\nHead to  [Sigma's Entreprises]",no_titlebar=True,font="Default 20")                        
                     else:
-                        sg.popup("Few... we were right,you are a trustable person.The money will be transfered in your account.",no_titlebar=True)
-                        money+=1000
-                        tools.append("Password Cracker")
-                        window['pippo'].update(f"Money Counter:{money}")
-                        window.extend_layout(window['LIST'], [([sg.Listbox(("Sigma's Entreprises", "Mission 3", "Mission 4", "Mission 5"),size=(300, 50),enable_events=True,key='Mission list')])])
+                        sg.popup("Why are you here then duh.",no_titlebar=True)
                         event, values = window.read()
                         window['LIST'].update(values["LIST"])
-                        Pswexists = "Password Cracker"  in tools
-                        sg.WIN_CLOSED==None
-                        sg.popup("Now let's go try your first true mission.\nHead to  [Sigma's Entreprises]",no_titlebar=True,font="Default 20")
-                        
-                        
-
-                else:
-                    sg.popup("Why are you here then duh.",no_titlebar=True)
-                    sg.WIN_CLOSED==None
-            if "Sigma's Entreprises" in values['Mission list'] and Pswexists==True:
+                    
+            if "Sigma's Entreprises" in values['Mission list']:
                 if sg.popup_yes_no("You have selected the mail from Sigma's Entreprises.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                     sg.popup(f"{Hack_Rules}",no_titlebar=True)
                     result = hacking_game()
