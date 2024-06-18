@@ -1,3 +1,8 @@
-my_list = ["a", "b", "a", "c", "c"]
-unique_list = list(set(my_list))
-print(unique_list)  # Output: ['a', 'b', 'c']
+list=[]
+
+for i in range(1,8):
+    list.append(i)
+print(list)
+print(list[0])
+print(list[1])
+print(list[7])

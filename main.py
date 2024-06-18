@@ -7,6 +7,7 @@ import pygame
 import random
 import time
 import string
+from random import *
 
 # Fonction principale du jeu de hacking
 def hacking_game():
@@ -334,11 +335,37 @@ def password_game():
 
 
 
+
 def layout1():
     rawtools=[]
     money=0
     mission1won=0
     tools = list(set(rawtools))
+    Pswexists = "Password Cracker"  in rawtools
+    Decexists = "Decrypter" in rawtools
+    Fireexists = "Firewall Bypass"  in rawtools
+    IPexists = "IP Probe"  in rawtools
+    def MissionHacking():
+        if Pswexists!=True:
+            if sg.popup_yes_no(f"Watch out, you don't have the Password Breaker, the mission could me harder do you still want to continue?",no_titlebar=True)=="No":
+                sg.WIN_CLOSED==None
+                
+        listeentreprises=["Sigma's Entreprises","Acme Corporation", "InGen", "Monsters, Inc.", "Gringotts", "Umbrella Corporation", "Hooli", "Massive Dynamic", "Wonka Candy Company", "The Krusty Krab", "Dunder Mifflin",]
+        randomselection=listeentreprises[randint(0,10)]#il y a 11 termes et 0 est le premier
+        if sg.popup_yes_no(f"You have selected the mail from {randomselection}.\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+                        sg.popup(f"{Hack_Rules}",no_titlebar=True)
+                        result = hacking_game()
+                        if result==1:
+                            sg.popup("GG You won",no_titlebar=True)
+                            money+=1500
+                            window['pippo'].update(f"Money Counter:{money}")
+                        if result==0:
+                            sg.popup("You lost",no_titlebar=True)
+                            sg.WIN_CLOSED==None
+
+        else:
+                        
+            sg.WIN_CLOSED==None
 
     marketdata = ["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["IP Probe","Probe the ip",10000]
     
@@ -362,6 +389,7 @@ def layout1():
     while True:                             # Event Loop
         event, values = window.read()       # type: str, dict
         print(event,values)
+        
         if event=="Free money":
             money+=300
             window['pippo'].update(f"Money Counter:{money}")
@@ -382,10 +410,7 @@ def layout1():
                         tools = list(set(rawtools))
                         window['-TOOLS-'].update(f"Tools Owned: {tools}")
                         window['pippo'].update(f"Money Counter:{money}")
-                        Pswexists = "Password Cracker"  in rawtools
-                        Decexists = "Decrypter" in rawtools
-                        Fireexists = "Firewall Bypass"  in rawtools
-                        IPexists = "IP Probe"  in rawtools
+                        
                         if Pswexists==True:
                            sg.popup("You successfully bought the Password Cracker",no_titlebar=True)
                         if Decexists==True:
@@ -395,12 +420,9 @@ def layout1():
                         if IPexists==True:
                            sg.popup("You successfully bought the IP Probe",no_titlebar=True)
                 else:
-                    sg.WIN_CLOSED==None 
-
-            # rawtools.append(selected_tool)  # Add the selected row to the tools list
-            # window['-TOOLS-'].update(tools)  # Update the Text element to show selected tools
-            # tools = list(set(rawtools))
-            # print(selected_price)
+                    sg.WIN_CLOSED==None
+         
+    
                 
         if event == 'LIST' and len(values['LIST']):
             if "Mission 1" in values['LIST']:
@@ -439,5 +461,7 @@ def layout1():
                 else:
                     
                     sg.WIN_CLOSED==None
+            if "Mission 3" in values["Mission list"]:
+                MissionHacking()
     window.close()
 layout1()
