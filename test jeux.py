@@ -3,6 +3,7 @@ import random
 import string
 
 def password_game():
+    global pswexists
     pygame.init()
     # Configuration de la fenêtre
     largeur, hauteur = 800, 600
@@ -57,6 +58,7 @@ def password_game():
     max_attempts = 3
     horloge = pygame.time.Clock()
     win = 0  # 0: Perdu, 1: Gagné
+    
 
     running = True
     game_over = False
@@ -67,7 +69,7 @@ def password_game():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
                 x, y = event.pos
-                if 600 <= x <= 780 and 500 <= y <= 580:
+                if Pswexists and 600 <= x <= 780 and 500 <= y <= 580:
                     message = password_breaker_button()
             elif event.type == pygame.KEYDOWN and not game_over:
                 if event.key == pygame.K_RETURN:
@@ -98,10 +100,11 @@ def password_game():
         fenetre.blit(text_attempts_left, (20, 60))
         if message:
             fenetre.blit(text_message, (20, 100))
-        pygame.draw.rect(fenetre, BLANC, (600, 500, 180, 80))
-        pygame.draw.rect(fenetre, NOIR, (605, 505, 170, 70))
-        title_rect = title.get_rect(center=(605 + 85, 505 + 35))
-        fenetre.blit(title, title_rect)
+        if Pswexists:
+            pygame.draw.rect(fenetre, BLANC, (600, 500, 180, 80))
+            pygame.draw.rect(fenetre, NOIR, (605, 505, 170, 70))
+            title_rect = title.get_rect(center=(605 + 85, 505 + 35))
+            fenetre.blit(title, title_rect)
 
         pygame.display.flip()
         horloge.tick(30)
@@ -113,6 +116,6 @@ def password_game():
     pygame.quit()
     return win
 
-win = password_game()
-
-
+# Exécutez le jeu
+resultat = password_game()
+print("Résultat du jeu:", "Gagné" if resultat == 1 else "Perdu")

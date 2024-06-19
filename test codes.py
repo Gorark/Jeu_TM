@@ -17,8 +17,11 @@ while True:
         break
     if event == "Remove Selected Item":
         selected_indices = window["-LISTBOX-"].get_indexes()
+        
         if selected_indices:
             selected_index = selected_indices[0]
+            print(selected_index)
+            
             items.pop(selected_index)
             window["-LISTBOX-"].update(values=items)
 

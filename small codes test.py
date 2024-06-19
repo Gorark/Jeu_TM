@@ -1,8 +1,4 @@
-list=[]
-
-for i in range(1,8):
-    list.append(i)
-print(list)
-print(list[0])
-print(list[1])
-print(list[7])
+from random import *
+list=[1,2,3]
+randomselection=list[randint(0,len(list[-1]))]
+print(randomselection)
