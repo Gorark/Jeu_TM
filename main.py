@@ -9,7 +9,7 @@ import string
 from random import *
 
 # Fonction principale du jeu de hacking
-def hacking_game():
+def hacking_game():#créé avec IA, je l'ai guidée dans le developpement entier, je me suis juste occuper personnelement des éléments pour l'intégrer à mon code
     # Initialiser Pygame
     pygame.init()
 
@@ -199,7 +199,7 @@ def hacking_game():
 
     pygame.quit()
     return game_result
-
+# le texte de règles ci dessous a été créé avec IA, je lui ai juste demander d'énoncer les règles de son jeu
 Hack_Rules = """Game Controls and Rules\n
 Controls:\n
 - Move Up: W\n
@@ -219,8 +219,8 @@ Rules:\n
    - If time runs out before reaching 10, you lose.\n
 Good luck!\n"""
 
-def password_game():
-    global pswex
+def password_game(): #créé avec IA, je l'ai guidée dans le developpement entier, je me suis juste occuper personnelement des éléments pour l'intégrer à mon code
+    global Pswexists
     pygame.init()
     # Configuration de la fenêtre
     largeur, hauteur = 800, 600
@@ -255,8 +255,8 @@ def password_game():
             pygame.display.flip()
             pygame.time.delay(30)
 
-    # Fonction du bouton Password Breaker
-    def password_breaker_button():
+    # Fonction du bouton Password Cracker
+    def password_Cracker_button():
         progress_bar()
         return f"The password is: {mot_de_passe}"
 
@@ -287,18 +287,18 @@ def password_game():
             elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
                 x, y = event.pos
                 if Pswexists and 600 <= x <= 780 and 500 <= y <= 580:
-                    message = password_breaker_button()
+                    message = password_Cracker_button()
             elif event.type == pygame.KEYDOWN and not game_over:
                 if event.key == pygame.K_RETURN:
                     if attempt == mot_de_passe:
-                        message = "Access Granted. You Win!"
+                        message = "Access Granted."
                         win = 1
                         game_over = True
                     else:
                         message = "Access Denied"
                         attempt_count += 1
                         if attempt_count >= max_attempts:
-                            message = f"Access Denied. You Lost. The password was: {mot_de_passe}"
+                            message = f"Access Denied. You Lost." # The password was: {mot_de_passe}
                             win = 0
                             game_over = True
                         attempt = ""
@@ -311,7 +311,7 @@ def password_game():
         text_attempt = police.render(f"Attempt: {attempt}", True, BLANC)
         text_message = police.render(message, True, ROUGE if message.startswith("Access Denied") else VERT)
         text_attempts_left = police.render(f"Attempts left: {max_attempts - attempt_count}", True, BLANC)
-        title = police_titre.render("Password Breaker", True, VERT)
+        title = police_titre.render("Password Cracker", True, VERT)
 
         fenetre.blit(text_attempt, (20, 20))
         fenetre.blit(text_attempts_left, (20, 60))
@@ -343,16 +343,13 @@ rawtools=[]
 money=0
 mission1won=0
 tools = list(set(rawtools))
-Pswexists = "Password Cracker"  in rawtools
-Decexists = "Decrypter" in rawtools
-Fireexists = "Firewall Bypass"  in rawtools
-IPexists = "IP Probe"  in rawtools
+pswcount=0
+
 
 def MissionNames():
     listeentreprises=["Acme Corporation", "InGen", "Monsters, Inc.", "Gringotts", "Umbrella Corporation", "Hooli", "Massive Dynamic", "Wonka Candy Company", "The Krusty Krab", "Dunder Mifflin", "Cyberdyne Systems", "Wayne Enterprises", "Stark Industries", "Oscorp", "LexCorp", "Tyrell Corporation", "Nakatomi Trading Corporation", "Omni Consumer Products (OCP)", "Blue Sun Corporation", "Vehement Capital Partners", "Globex Corporation", "Soylent Corp", "Initech", "Callister Inc", "Cheers", "Ollivander's Wand Shop", "Gekko and Co.", "The Dharma Initiative", "Wally World", "The Leftorium", "McDowell’s", "Bada Bing", "Vitameatavegamin", "Bushwood Country Club", "Consumer Recreation Services", "The Max", "Mel’s Diner", "Paper Street Soap Company", "The Foundation", "The Peach Pit", "Merrick BioTech", "The Reef", "Macmillan Toys", "Blue Moon Detective Agency", "Stay Puft Corporation", "Silver Shamrock", "El Banco Corrupto", "Victoria’s Circuit", "Madam Malkin’s Robes for All Occasions", "Arcade Flower Shop", "Atlantic American Airlines", "KACL", "Flingers"]
-    randomselection=listeentreprises[randint(0,51)]#il y a 52 termes et 0 est le premier
+    randomselection=listeentreprises[randint(0,len(listeentreprises)-1)]
     return randomselection        
-
 
 def Missionoption3num():
     Missiontype=3
@@ -376,14 +373,62 @@ def Missionadder():
     event, values = window.read()
     window['Mission list'].update(values=missions)
     selected_indices = window["Mission list"].get_indexes()
+def progressbar():
+    # Layout the form
+    newlayout = [[sg.Text('Energy')],
+              [sg.ProgressBar(100000, orientation='h', size=(20, 20), key='progress')],
+              [sg.Button("Pay")]]
+
+    # Create the window
+    newwindow = sg.Window('Custom Progress Meter', layout)
+    progress_bar = window['progress']
+    current_value = 0
+
+    # Event loop
+    while True:
+        event, values = window.read(timeout=10)
+        
+        if event == sg.WIN_CLOSED:
+            break
+        
+        if event == 'Pay':
+            current_value = max(0, current_value - 30000)
+        else:
+            current_value = min(10000, current_value + 10)
+        
+        progress_bar.update(current_value)
+        
+        if current_value == 10000:
+            break
+
+    # Close the window when done
+    window.close()
+
+def randomnamegenerator():
+    first_names = ['John', 'Emma', 'Michael', 'Sophia', 'William', 'Olivia', 'James', 'Ava', 'Robert', 'Isabella', 
+                'David', 'Mia', 'Joseph', 'Charlotte', 'Daniel', 'Amelia', 'Thomas', 'Harper', 'Christopher', 'Evelyn']
+
+    last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 
+                'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin']
+
+    random_first_name = choice(first_names)
+    random_last_name = choice(last_names)
+
+    rdmname = f"{random_first_name} {random_last_name}"
+    return rdmname
+def randombehaviourgenerator():
+    behaviours = ["Hard Working", "Lazy", "Normal Worker", "ChatGPT User", "Grinder"]
+    random_behaviour = choice(behaviours)
+
+    return random_behaviour
 
 
-
-marketdata = ["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["IP Probe","Probe the ip",10000]
+marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["IP Probe","Probe the ip",10000])   
+Teamshop=[randomnamegenerator(),"Password Cracker",randombehaviourgenerator(),"10000"],[randomnamegenerator(),"Password Cracker",randombehaviourgenerator(),"10000"]
 missions=["Your first mission"]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
 tab_layout2 = [[sg.Button('Team Management'),]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Behaviour", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WOKRERSHOP')]]
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
 #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
@@ -400,49 +445,68 @@ def MissionHacking():
         chosenmission=missions[chosenmissionnumber]
         if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                         if Pswexists!=True:
-                            if sg.popup_yes_no(f"Watch out, you don't have the Password Breaker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
+                            if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
                                 sg.WIN_CLOSED==None
+                        sg.popup("Now you will ",no_titlebar=True)
                         sg.popup(f"{Hack_Rules}",no_titlebar=True)
                         result = hacking_game()
                         if result==1:
+
                             sg.popup("GG You won",no_titlebar=True)
                             money+=1500
                             window['pippo'].update(f"Money Counter:{money}")
+                            Missionadder()
                         if result==0:
                             sg.popup("You lost",no_titlebar=True)
                             sg.WIN_CLOSED==None
+                            Missionadder()
         else:               
             sg.WIN_CLOSED==None
 def MissionPassword():
+    global money
+    Pswexists = "Password Cracker" in rawtools
+    result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
     selected_indices = window["Mission list"].get_indexes()
+    pswtext=["recover access to a critical server after the password was lost", "investigate potential insider threats by accessing encrypted files", "retrieve data from a locked device for a legal case", "test the security of their systems against potential breaches", "access an employee's account after they left the company without sharing credentials", "bypass forgotten passwords on essential software", "ensure compliance with cybersecurity regulations by testing password strength", "recover encrypted data after a ransomware attack", "access backup systems when primary credentials fail", "audit and improve password policies by identifying weak points."]
+    randompswtext=pswtext[randint(0,len(pswtext)-1)]
     if selected_indices:
         chosenmissionnumber = selected_indices[0] 
         chosenmission=missions[chosenmissionnumber]
-        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{randompswtext}\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                         if Pswexists!=True:
-                            if sg.popup_yes_no(f"Watch out, you don't have the Password Breaker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
+                            if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
                                 sg.WIN_CLOSED==None
-                        sg.popup(f"{Hack_Rules}",no_titlebar=True)
-                        result = hacking_game()
+                            else:
+                               result = password_game() 
+                        #sg.popup("",no_titlebar=True)
+                        if Pswexists==True: 
+                             result = password_game()
                         if result==1:
-                            sg.popup("GG You won",no_titlebar=True)
+                            #sg.popup("GG You won",no_titlebar=True)
                             money+=1500
                             window['pippo'].update(f"Money Counter:{money}")
+                            Missionadder()
                         if result==0:
-                            sg.popup("You lost",no_titlebar=True)
+                            #sg.popup("You lost",no_titlebar=True)
+                            sg.WIN_CLOSED==None
+                            Missionadder()
+                        else:               
                             sg.WIN_CLOSED==None
         else:               
             sg.WIN_CLOSED==None
-#sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
-#sleep(0.2)
-#sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Your first mission] button for a little check",no_titlebar=True,font="Default 20")
+sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
+sleep(0.2)
+sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Your first mission] button for a little check",no_titlebar=True,font="Default 20")
 event, values = window.read()
 
 #print(event, values)
 while True:                             # Event Loop
     event, values = window.read()       # type: str, dict
     print(event,values)
-    
+    Pswexists = "Password Cracker" in rawtools
+    Decexists = "Decrypter" in rawtools
+    Fireexists = "Firewall Bypass" in rawtools
+    IPexists = "IP Probe" in rawtools
     if event=="Free money":
         money+=300
         window['pippo'].update(f"Money Counter:{money}")
@@ -451,27 +515,34 @@ while True:                             # Event Loop
     if event in (sg.WIN_CLOSED, '-EXIT-'):         # If the user exits
         break
     if event == 'Market':
-        selected_row_index = values['Market'][0]  # Get the index of the selected row +verif documentation
+        selected_row_index = values['Market'][0]  # Get the index of the selected row 
         selected_tool = marketdata[selected_row_index][0]  # Get the data of the selected row and the first column
         selected_price = marketdata[selected_row_index][-1]
-        if selected_price > money:
-            sg.popup("You don't have enough money to buy that.",no_titlebar=True)
-        if selected_price <= money:
-            if sg.popup_yes_no(f"Do you want to buy the {selected_tool}  for {selected_price}.-?",no_titlebar=True)=="Yes":
-                    money-=selected_price
-                    rawtools.append(selected_tool)
-                    tools = list(set(rawtools))
-                    window['-TOOLS-'].update(f"Tools Owned: {tools}")
-                    window['pippo'].update(f"Money Counter:{money}")
-                    if Pswexists==True:
-                        sg.popup("You successfully bought the Password Cracker",no_titlebar=True)
-                    if Decexists==True:
-                        sg.popup("You successfully bought the Decrypter",no_titlebar=True)
-                    if Fireexists==True:
-                        sg.popup("You successfully bought the Firewall Bypass",no_titlebar=True)
-                    if IPexists==True:
-                        sg.popup("You successfully bought the IP Probe",no_titlebar=True)
-            else:
+        if selected_tool in rawtools:
+            sg.popup("You already bought that tool.",no_titlebar=True)
+        else:
+            if selected_price > money:
+                sg.popup("You don't have enough money to buy that.",no_titlebar=True)
+            if selected_price <= money:
+                if sg.popup_yes_no(f"Do you want to buy the {selected_tool}  for {selected_price}.-?",no_titlebar=True)=="Yes":
+                        money-=selected_price
+                        rawtools.append(selected_tool)
+                        tools = list(set(rawtools))
+                        window['-TOOLS-'].update(f"Tools Owned: {tools}")
+                        window['pippo'].update(f"Money Counter:{money}")
+                        Pswexists = "Password Cracker" in rawtools
+                        Decexists = "Decrypter" in rawtools
+                        Fireexists = "Firewall Bypass" in rawtools
+                        IPexists = "IP Probe" in rawtools
+                        #marketdata.remove(selected_row_index)
+
+                        #pippo = { "passwordcracker": "v1.0", "decrypter": "v3.0", "cxiao": "mamma"}
+                        #pippo["ciao"] = "mamma"
+                        sg.popup(f"You successfully bought the {selected_tool}",no_titlebar=True)
+                        if Pswexists==True and pswcount==0:
+                            sg.popup("Now let's go try your first true mission with this tool.\n Head to [Missions] and choose one",no_titlebar=True,font="Default 20")
+                            pswcount+=1
+                        
                 sg.WIN_CLOSED==None
         
 
@@ -491,13 +562,14 @@ while True:                             # Event Loop
                         Missionadder()
                         sg.WIN_CLOSED==None
                         sleep(0.1)
-                        sg.popup("Now let's go try your first true mission.\nHead to  [Sigma's Entreprises]",no_titlebar=True,font="Default 20")                        
+                        sg.popup("Now go buy your first tool in the [Market] thanks to the money you just received",no_titlebar=True,font="Default 20")
+                        
+
                 else:
                     sg.popup("Why are you here then duh.",no_titlebar=True)
                     event, values = window.read()
                     window['Mission list'].update(values["Mission list"])
-        if missions[0] in values["Mission list"] and missions[0]!= "Your first mission":
-            MissionHacking()    
+        if missions[0] in values["Mission list"] and missions[0]!= "Your first mission":    
             MissionChooser()
         if missions[1] in values["Mission list"]:
             MissionChooser()
