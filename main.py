@@ -1,15 +1,15 @@
 import FreeSimpleGUI as sg
 from time import sleep
-sg.theme('Dark Grey 13')
+sg.theme('Dark Grey 11')
 import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide" #copié depuis internet
 import pygame
 import time
 import string
 from random import *
 
 # Fonction principale du jeu de hacking
-def hacking_game():#créé avec IA, je l'ai guidée dans le developpement entier, je me suis juste occuper personnelement des éléments pour l'intégrer à mon code
+def hacking_game():#créé avec IA(Gpt3.5), je l'ai guidée dans le developpement entier, la première requête àtait celle-ci"Code me a game that take the mechanic of hacking and reminds of hacking with a hacking driven graphics, the game should have a 90% win ratio"
     # Initialiser Pygame
     pygame.init()
 
@@ -199,7 +199,7 @@ def hacking_game():#créé avec IA, je l'ai guidée dans le developpement entier
 
     pygame.quit()
     return game_result
-# le texte de règles ci dessous a été créé avec IA, je lui ai juste demander d'énoncer les règles de son jeu
+# le texte de règles ci dessous a été créé avec IA, j'ai demandé à la suite de la conversation plus haut:"Fait moi une explication des touches et des règles du jeu en anglais"
 Hack_Rules = """Game Controls and Rules\n
 Controls:\n
 - Move Up: W\n
@@ -219,7 +219,7 @@ Rules:\n
    - If time runs out before reaching 10, you lose.\n
 Good luck!\n"""
 
-def password_game(): #créé avec IA, je l'ai guidée dans le developpement entier, je me suis juste occuper personnelement des éléments pour l'intégrer à mon code
+def password_game(): #créé avec IA,(Gpt3.5) avec cette commande"Create a hackign game in which you have to crack a password, make it a callable function le jeu doit être dans une fenêtre et avoir un gui plaisant, le mots de passe doit  être aléatoire mais trouvable grâce à une certain logique de laprt de l'utilisateur" 
     global Pswexists
     pygame.init()
     # Configuration de la fenêtre
@@ -344,6 +344,10 @@ money=0
 mission1won=0
 tools = list(set(rawtools))
 pswcount=0
+#pippo = { "passwordcracker": "v1.0", "decrypter": "v3.0", "cxiao": "mamma"}
+                        #pippo["ciao"] = "mamma"
+employees_owned = {}
+
 
 
 def MissionNames():
@@ -417,18 +421,28 @@ def randomnamegenerator():
     rdmname = f"{random_first_name} {random_last_name}"
     return rdmname
 def randombehaviourgenerator():
-    behaviours = ["Hard Working", "Lazy", "Normal Worker", "ChatGPT User", "Grinder"]
+    behaviours = ["Grinder","Normal Worker","ChatGPT User"]
     random_behaviour = choice(behaviours)
 
     return random_behaviour
+def randombravenessgenerator():
+    braveness=["Indiana Jones","Student","Chicken"] 
+    random_braveness = choice(braveness)
 
+    return random_braveness
+def randomtoolgenerator():
+    tools=["Password Cracker","Decrypter","Firewall Bypass","Log Eraser"] 
+    random_tools = choice(tools) 
+    
 
-marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["IP Probe","Probe the ip",10000])   
-Teamshop=[randomnamegenerator(),"Password Cracker",randombehaviourgenerator(),"10000"],[randomnamegenerator(),"Password Cracker",randombehaviourgenerator(),"10000"]
+    return random_tools
+
+marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
+Teamshop=[randomnamegenerator(),randomtoolgenerator(),randombehaviourgenerator(),10000],[randomnamegenerator(),randomtoolgenerator(),randombehaviourgenerator(),10000]
 missions=["Your first mission"]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
-tab_layout2 = [[sg.Button('Team Management'),]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Behaviour", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WOKRERSHOP')]]
+tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Behaviour", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]]
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
 #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
@@ -506,9 +520,9 @@ while True:                             # Event Loop
     Pswexists = "Password Cracker" in rawtools
     Decexists = "Decrypter" in rawtools
     Fireexists = "Firewall Bypass" in rawtools
-    IPexists = "IP Probe" in rawtools
+    IPexists = "Log Eraser" in rawtools
     if event=="Free money":
-        money+=300
+        money+=30000
         window['pippo'].update(f"Money Counter:{money}")
 
         print(money)
@@ -533,15 +547,34 @@ while True:                             # Event Loop
                         Pswexists = "Password Cracker" in rawtools
                         Decexists = "Decrypter" in rawtools
                         Fireexists = "Firewall Bypass" in rawtools
-                        IPexists = "IP Probe" in rawtools
+                        IPexists = "Log Eraser" in rawtools
                         #marketdata.remove(selected_row_index)
 
-                        #pippo = { "passwordcracker": "v1.0", "decrypter": "v3.0", "cxiao": "mamma"}
-                        #pippo["ciao"] = "mamma"
+                        
                         sg.popup(f"You successfully bought the {selected_tool}",no_titlebar=True)
                         if Pswexists==True and pswcount==0:
                             sg.popup("Now let's go try your first true mission with this tool.\n Head to [Missions] and choose one",no_titlebar=True,font="Default 20")
                             pswcount+=1
+                        
+                sg.WIN_CLOSED==None
+    if event == "WORKERSHOP":
+        selected_row_index = values["WORKERSHOP"][0]  # Get the index of the selected row 
+        selected_worker = Teamshop[selected_row_index][0]  # Get the data of the selected row and the first column
+        selected_skill = Teamshop[selected_row_index][1]
+        selected_behaviour = Teamshop[selected_row_index][2]
+        selected_price = Teamshop[selected_row_index][-1]
+        if selected_worker in employees_owned:
+            sg.popup("TEST",no_titlebar=True)
+        else:
+            if selected_price > money:
+                sg.popup("You don't have enough money to buy that.",no_titlebar=True)
+            if selected_price <= money:
+                if sg.popup_yes_no(f"Do you want to recruit {selected_worker}  for {selected_price}.-?",no_titlebar=True)=="Yes":
+                        money-=selected_price                       
+                        employees_owned.update({selected_worker: [selected_skill,selected_behaviour]})
+                        window['TEAM'].update(f"Team: {employees_owned}")
+                        window['pippo'].update(f"Money Counter:{money}")
+                        sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)
                         
                 sg.WIN_CLOSED==None
         
