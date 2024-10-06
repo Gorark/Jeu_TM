@@ -9,7 +9,7 @@ import string
 from random import *
 
 # Fonction principale du jeu de hacking
-def hacking_game():#créé avec IA(Gpt3.5), je l'ai guidée dans le developpement entier, la première requête àtait celle-ci"Code me a game that take the mechanic of hacking and reminds of hacking with a hacking driven graphics, the game should have a 90% win ratio"
+def hacking_game():#créé avec IA(ChatGpt3.5), je l'ai guidée dans le developpement, la première requête était celle-ci"Code me a game that take the mechanic of hacking and reminds of hacking with a hacking driven graphics, the game should have a 90% win ratio"
     # Initialiser Pygame
     pygame.init()
 
@@ -123,7 +123,7 @@ def hacking_game():#créé avec IA(Gpt3.5), je l'ai guidée dans le developpemen
     running = True
     clock = pygame.time.Clock()
     start_time = time.time()  # Début du timer
-    time_limit = 60  # Limite de temps en secondes
+    time_limit = 45  # Limite de temps en secondes
 
     # Boucle principale du jeu
     while running:
@@ -219,8 +219,8 @@ Rules:\n
    - If time runs out before reaching 10, you lose.\n
 Good luck!\n"""
 
-def password_game(): #créé avec IA,(Gpt3.5) avec cette commande"Create a hackign game in which you have to crack a password, make it a callable function le jeu doit être dans une fenêtre et avoir un gui plaisant, le mots de passe doit  être aléatoire mais trouvable grâce à une certain logique de laprt de l'utilisateur" 
-    global Pswexists
+def password_game(): #créé avec IA,(ChatGpt3.5) avec cette commande"Create a hackign game in which you have to crack a password, make it a callable function le jeu doit être dans une fenêtre et avoir un gui plaisant, le mots de passe doit  être aléatoire mais trouvable grâce à une certain logique de laprt de l'utilisateur" 
+    global Pswexists #la suite de l'integration du jeu a été faite par moi
     pygame.init()
     # Configuration de la fenêtre
     largeur, hauteur = 800, 600
@@ -420,11 +420,11 @@ def randomnamegenerator():
 
     rdmname = f"{random_first_name} {random_last_name}"
     return rdmname
-def randombehaviourgenerator():
-    behaviours = ["Grinder","Normal Worker","ChatGPT User"]
-    random_behaviour = choice(behaviours)
+def randomMotivationgenerator():
+    Motivation = ["Grinder","Normal Worker","ChatGPT User"]
+    random_Motivation = choice(Motivation)
 
-    return random_behaviour
+    return random_Motivation
 def randombravenessgenerator():
     braveness=["Indiana Jones","Student","Chicken"] 
     random_braveness = choice(braveness)
@@ -438,11 +438,11 @@ def randomtoolgenerator():
     return random_tools
 
 marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
-Teamshop=[randomnamegenerator(),randomtoolgenerator(),randombehaviourgenerator(),10000],[randomnamegenerator(),randomtoolgenerator(),randombehaviourgenerator(),10000]
+Teamshop=[randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),10000],[randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),10000]
 missions=["Your first mission"]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
 tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Behaviour", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]]
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
 #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
@@ -454,20 +454,25 @@ if selected_indices:
     chosenmission = selected_indices[0] 
 def MissionHacking():
     global selected_indices
+    global money
+    Pswexists = "Password Cracker" in rawtools
+    result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
+    selected_indices = window["Mission list"].get_indexes()
+    moneyreward=10500
     if selected_indices:
         chosenmissionnumber = selected_indices[0] 
         chosenmission=missions[chosenmissionnumber]
-        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: {moneyreward}.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                         if Pswexists!=True:
                             if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
                                 sg.WIN_CLOSED==None
-                        sg.popup("Now you will ",no_titlebar=True)
+                        sg.popup("Now you will start the hacking those are the rules ",no_titlebar=True)
                         sg.popup(f"{Hack_Rules}",no_titlebar=True)
                         result = hacking_game()
                         if result==1:
 
-                            sg.popup("GG You won",no_titlebar=True)
-                            money+=1500
+                            sg.popup("You completed the mission with success.\nTake your money reward.",no_titlebar=True)
+                            money+=moneyreward
                             window['pippo'].update(f"Money Counter:{money}")
                             Missionadder()
                         if result==0:
@@ -483,10 +488,11 @@ def MissionPassword():
     selected_indices = window["Mission list"].get_indexes()
     pswtext=["recover access to a critical server after the password was lost", "investigate potential insider threats by accessing encrypted files", "retrieve data from a locked device for a legal case", "test the security of their systems against potential breaches", "access an employee's account after they left the company without sharing credentials", "bypass forgotten passwords on essential software", "ensure compliance with cybersecurity regulations by testing password strength", "recover encrypted data after a ransomware attack", "access backup systems when primary credentials fail", "audit and improve password policies by identifying weak points."]
     randompswtext=pswtext[randint(0,len(pswtext)-1)]
+    chosenpswtext=randompswtext
     if selected_indices:
         chosenmissionnumber = selected_indices[0] 
         chosenmission=missions[chosenmissionnumber]
-        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{randompswtext}\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
+        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
                         if Pswexists!=True:
                             if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
                                 sg.WIN_CLOSED==None
@@ -561,7 +567,7 @@ while True:                             # Event Loop
         selected_row_index = values["WORKERSHOP"][0]  # Get the index of the selected row 
         selected_worker = Teamshop[selected_row_index][0]  # Get the data of the selected row and the first column
         selected_skill = Teamshop[selected_row_index][1]
-        selected_behaviour = Teamshop[selected_row_index][2]
+        selected_Motivation = Teamshop[selected_row_index][2]
         selected_price = Teamshop[selected_row_index][-1]
         if selected_worker in employees_owned:
             sg.popup("TEST",no_titlebar=True)
@@ -571,7 +577,7 @@ while True:                             # Event Loop
             if selected_price <= money:
                 if sg.popup_yes_no(f"Do you want to recruit {selected_worker}  for {selected_price}.-?",no_titlebar=True)=="Yes":
                         money-=selected_price                       
-                        employees_owned.update({selected_worker: [selected_skill,selected_behaviour]})
+                        employees_owned.update({selected_worker: [selected_skill,selected_Motivation]})
                         window['TEAM'].update(f"Team: {employees_owned}")
                         window['pippo'].update(f"Money Counter:{money}")
                         sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)
@@ -611,5 +617,5 @@ while True:                             # Event Loop
         if missions[3] in values["Mission list"]:
             MissionPassword()
         if missions[-1] in values["Mission list"] and missions[0]!= "Your first mission":
-            MissionChooser()
+            MissionHacking()
 window.close()
