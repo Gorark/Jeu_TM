@@ -349,7 +349,7 @@ pswcount=0
 employees_owned = {}
 employed_employees ={}
 free_employees = {}
-list_free_employees=[f'{key} {value}' for key, value in free_employees.items()]
+tuple_free_employees=[f'{key} {value}' for key, value in free_employees.items()]
 
 
 
@@ -472,7 +472,7 @@ marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decryp
 Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
 missions=["Your first mission"]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
-tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=list_free_employees, headings=["Name", "Skills","Motivation"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
+tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills",],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
 tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]]
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
@@ -529,6 +529,10 @@ def MissionPassword():
                 "Do you want to choose this mission?"
             )
         if result == 'Yes':
+            if selected_options:
+                sg.popup(f'You Selected those employees: {", ".join(selected_options)}')
+            else:
+                sg.popup('You are going to complete the mission alone because you selected no employees')
             sg.popup(f'You chose Yes and selected: {", ".join(selected_options)}')
         elif result == 'No':
             sg.WIN_CLOSED==None
@@ -624,12 +628,13 @@ while True:                             # Event Loop
                             money-=selected_price                       
                             employees_owned.update({selected_worker: [selected_skill,selected_Motivation]})
                             free_employees.update({selected_worker: [selected_skill,selected_Motivation]})
-                            list_free_employees=tuple(free_employees.items())
-                            print(list_free_employees)
+                            tuple_free_employees=tuple(free_employees.items())
+                            list_free_employees= [f'{key} {value}' for key, value in free_employees.items()]
+                            print("list",list_free_employees)
                             print(employees_owned)
-                            print(free_employees)
+                            print(tuple_free_employees)
                             window['TEAM'].update(f"Team: {employees_owned}")
-                            window['Employees'].update(list_free_employees)
+                            window['Employees'].update(tuple_free_employees)
                             Teamshop=()
                             Teamshop=([*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000])
                             window['WORKERSHOP'].update(Teamshop)
