@@ -351,6 +351,13 @@ dictionnary_free_employees = {}
 tuple_free_employees=[f'{key} {value}' for key, value in dictionnary_free_employees.items()]
 list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
 
+class Mission:
+    def __init__(self, name, dangerosity, nb_employees):
+        self.name = name
+        self.dangerosity = randint(1,3)
+        self.nb_employees = randint(1,4)
+        self.missiontype=randint(0, 1)
+
 
 
 
@@ -359,28 +366,25 @@ def MissionNames():
     randomselection=listeentreprises[randint(0,len(listeentreprises)-1)]
     return randomselection        
 
-def Missionoption3num():
-    Missiontype=3
-    return "rip"
 
-def MissionChooser():
-    Missiontypes = [1, 2, 3]
-    n = randint(0, 2)
+def MissionChooser(n):
+    #Missiontypes = [1, 2]
+    #n = randint(0, 1)
     if n == 0:
         Missionchoosen = MissionHacking()
     elif n == 1:
         Missionchoosen = MissionPassword()
-    elif n == 2:
-        Missionchoosen = Missionoption3num()
     return Missionchoosen
 def Missionadder():
     missions.clear()
     for i in range(5):
-        missions.append(MissionNames())
-        print(missions)
+        mission_name = MissionNames()
+        mission = Mission(mission_name, dangerosity, nb_employees)
+        missions.append(mission)
+    print([mission.name for mission in missions])
+    print(missions)
     event, values = window.read()
-    window['Mission list'].update(values=missions)
-    selected_indices = window["Mission list"].get_indexes()
+    window['Mission list'].update(values=[mission.name for mission in missions])
 def yes_no_popup_with_listbox(title, message, options,message2, default_values=None):
     if default_values is None:
         default_values = []
@@ -474,13 +478,15 @@ def dangerositygenerator():
 def nbremployeesgenerator():
     nbremployees=randint(1,3)
     return nbremployees
+dangerosity = dangerositygenerator()
+nb_employees = nbremployeesgenerator()
 
 
 
 marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
 Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
-missions=["Your first mission"]
-tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
+missions=[]
+tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=[mission.name for mission in missions],size=(300, 50),enable_events=True,key="Mission list")]]
 tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')],[sg.Table(values=tuple_employed_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
 tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
@@ -489,6 +495,7 @@ layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money
 #rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )
 layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3),sg.Tab("User", tab_layout4)]])])
 window = sg.Window('CyberOps Entreprises', layout, finalize=True) 
+Missionadder()
 selected_indices = window["Mission list"].get_indexes()
 if selected_indices:
     chosenmission = selected_indices[0] 
@@ -533,10 +540,12 @@ def MissionPassword():
 
     if selected_indices:
         chosenmissionnumber = selected_indices[0] 
-        chosenmission=missions[chosenmissionnumber]
+        chosenmission=selected_mission.name
+        chosendangerosity=selected_mission.dangerosity
+        chosennbemployees=selected_mission.nb_employees
         result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
-                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{nbremployeesgenerator()} or more employees required\n Danger Level{dangerositygenerator()}\n Reward: 1500.-\n Here you can select the employees you want to send",
+                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: 1500.-\n Here you can select the employees you want to send",
                 list_free_employees,
                 "Do you want to choose this mission?"
             )
@@ -673,43 +682,17 @@ while True:                             # Event Loop
                             Teamshop=([*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000])
                             window['WORKERSHOP'].update(Teamshop)
                             window['pippo'].update(f"Money Counter:{money}")
-                            sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)
-                            
-                            
+                            sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)       
                     sg.WIN_CLOSED==None
         
 
             
     if event == 'Mission list' and len(values['Mission list']):
-        if "Your first mission" in values['Mission list']:
-            while mission1won != 1:
-                if sg.popup_yes_no("You have selected your first mission.\nFrom: Your Sensei\nWe need to check that you are a reasonable guy and not a dumbass.\nReward: 1000.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
-                    if sg.popup_yes_no("You chose this mission, now answer the question to complete it.\nThis is the question:\nIf you enter a stranger's pc do you know the password?",no_titlebar=True)=="Yes":
-                        sg.popup("You lost, it is protected you need a tool to know it",no_titlebar=True)
-                        sg.WIN_CLOSED==None
-                    else:
-                        sg.popup("Few... we were right,you are a trustable person.The money will be transfered in your account.",no_titlebar=True)
-                        money+=1000
-                        window['pippo'].update(f"Money Counter:{money}")
-                        mission1won=1
-                        Missionadder()
-                        sg.WIN_CLOSED==None
-                        sleep(0.1)
-                        sg.popup("Now go buy your first tool in the [Market] thanks to the money you just received",no_titlebar=True,font="Default 20")
-                        
-
-                else:
-                    sg.popup("Why are you here then duh.",no_titlebar=True)
-                    event, values = window.read()
-                    window['Mission list'].update(values["Mission list"])
-        if missions[0] in values["Mission list"] and missions[0]!= "Your first mission":    
-            MissionChooser()
-        if missions[1] in values["Mission list"]:
-            MissionChooser()
-        if missions[2] in values["Mission list"]:
-            MissionChooser()
-        if missions[3] in values["Mission list"]:
-            MissionPassword()
-        if missions[-1] in values["Mission list"] and missions[0]!= "Your first mission":
-            MissionHacking()
+        selected_mission_name = values['Mission list'][0]
+        for mission in missions:
+            if mission.name == selected_mission_name:
+                selected_mission = mission
+                break
+        
+        MissionChooser(mission.missiontype)
 window.close()
