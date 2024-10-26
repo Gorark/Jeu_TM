@@ -347,8 +347,9 @@ pswcount=0
 employees_owned = {}
 employed_employees ={}
 tuple_employed_employees=[f'{key} {value}' for key, value in employed_employees.items()]
-free_employees = {}
-tuple_free_employees=[f'{key} {value}' for key, value in free_employees.items()]
+dictionnary_free_employees = {}
+tuple_free_employees=[f'{key} {value}' for key, value in dictionnary_free_employees.items()]
+list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
 
 
 
@@ -535,7 +536,7 @@ def MissionPassword():
         chosenmission=missions[chosenmissionnumber]
         result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
-                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{nbremployeesgenerator} or more required\n Danger Level{dangerositygenerator}\nReward: 1500.-\nHere you can select the employees you want to send",
+                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{nbremployeesgenerator()} or more employees required\n Danger Level{dangerositygenerator()}\n Reward: 1500.-\n Here you can select the employees you want to send",
                 list_free_employees,
                 "Do you want to choose this mission?"
             )
@@ -659,10 +660,10 @@ while True:                             # Event Loop
                     if sg.popup_yes_no(f"Do you want to recruit {selected_worker}  for {selected_price}.-?",no_titlebar=True)=="Yes":
                             money-=selected_price                       
                             employees_owned.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
-                            free_employees.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
-                            tuple_free_employees=tuple(free_employees.items())
+                            dictionnary_free_employees.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
+                            tuple_free_employees=tuple(dictionnary_free_employees.items())
                             tuple_employed_employees=tuple(employed_employees.items())
-                            list_free_employees= [f'{key} {value}' for key, value in free_employees.items()]
+                            list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
                             print("list",list_free_employees)
                             print(employees_owned)
                             print(tuple_free_employees)
