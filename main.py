@@ -357,6 +357,12 @@ class Mission:
         self.dangerosity = randint(1,3)
         self.nb_employees = randint(1,4)
         self.missiontype=randint(0, 1)
+class Mission:
+    def __init__(self, name, Skills, Motivation, Braveness):
+        self.name = name
+        self.dangerosity = randint(1,3)
+        self.nb_employees = randint(1,4)
+        self.missiontype=randint(0, 1)
 
 
 
@@ -381,8 +387,8 @@ def Missionadder():
         mission_name = MissionNames()
         mission = Mission(mission_name, dangerosity, nb_employees)
         missions.append(mission)
-    print([mission.name for mission in missions])
-    print(missions)
+    #print([mission.name for mission in missions])
+    #print(missions)
     event, values = window.read()
     window['Mission list'].update(values=[mission.name for mission in missions])
 def yes_no_popup_with_listbox(title, message, options,message2, default_values=None):
@@ -471,7 +477,16 @@ def randomtoolgenerator():
     return random_tools
 def employeesgenerator():
     return randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),randombravenessgenerator()
-
+def reussitemission():
+    global selected_options
+    txreussite=((((len(selected_options))/chosennbemployees))*100+((len(selected_options)*chosendangerosity)))
+    if randint(1,100) < txreussite:
+        resultat="Win"
+    else:
+        resultat="Lose"
+    print("tx",txreussite)
+    print("len:",len(selected_options))
+    return resultat
 def dangerositygenerator():
     dangerosity=randint(1,3)
     return dangerosity
@@ -482,7 +497,6 @@ dangerosity = dangerositygenerator()
 nb_employees = nbremployeesgenerator()
 
 
-
 marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
 Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
 missions=[]
@@ -491,8 +505,6 @@ tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 
 tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
-#layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
-#rectangle = window['fond'].DrawRectangle((10,10), (1250,1240), fill_color='gray', line_color='black'  )
 layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3),sg.Tab("User", tab_layout4)]])])
 window = sg.Window('CyberOps Entreprises', layout, finalize=True) 
 Missionadder()
@@ -531,6 +543,7 @@ def MissionPassword():
     global money
     global selected_options
     global list_free_employees
+    global chosenmissionnumber,chosenmission,chosendangerosity,chosennbemployees
     Pswexists = "Password Cracker" in rawtools
     result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
     selected_indices = window["Mission list"].get_indexes()
@@ -551,7 +564,23 @@ def MissionPassword():
             )
         if result == 'Yes':
             if selected_options:
-                sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
+                if len(selected_options) >= chosennbemployees and len(selected_options)!=0:
+                    sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
+                    tuple_selected_options=tuple(selected_options)
+                    print(tuple_selected_options)
+                    resultat=reussitemission()
+                    if reussitemission=="Win":
+                        money+=1500
+                        window['pippo'].update(f"Money Counter:{money}")
+                        Missionadder()
+                    if reussitemission=="Lose":
+                        
+                        Missionadder()
+
+                if len(selected_options) < chosennbemployees:
+                    sg.popup("You did not select enough employees")
+                    sg.WIN_CLOSED==None
+
 
             else:
                 sg.popup('You are going to complete the mission alone because you selected no employees',no_titlebar=True)
@@ -673,9 +702,9 @@ while True:                             # Event Loop
                             tuple_free_employees=tuple(dictionnary_free_employees.items())
                             tuple_employed_employees=tuple(employed_employees.items())
                             list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
-                            print("list",list_free_employees)
-                            print(employees_owned)
-                            print(tuple_free_employees)
+                            #print("list",list_free_employees)
+                            #print(employees_owned)
+                            #print(tuple_free_employees)
                             window['TEAM'].update(f"Team: {employees_owned}")
                             window['Employees'].update(tuple_free_employees)
                             Teamshop=()
