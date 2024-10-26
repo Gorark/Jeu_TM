@@ -344,10 +344,9 @@ money=0
 mission1won=0
 tools = list(set(rawtools))
 pswcount=0
-#pippo = { "passwordcracker": "v1.0", "decrypter": "v3.0", "cxiao": "mamma"}
-                        #pippo["ciao"] = "mamma"
 employees_owned = {}
 employed_employees ={}
+tuple_employed_employees=[f'{key} {value}' for key, value in employed_employees.items()]
 free_employees = {}
 tuple_free_employees=[f'{key} {value}' for key, value in free_employees.items()]
 
@@ -466,14 +465,23 @@ def randomtoolgenerator():
 
     return random_tools
 def employeesgenerator():
-    return randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator()
+    return randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),randombravenessgenerator()
+
+def dangerositygenerator():
+    dangerosity=randint(1,3)
+    return dangerosity
+def nbremployeesgenerator():
+    nbremployees=randint(1,3)
+    return nbremployees
+
+
 
 marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
 Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
 missions=["Your first mission"]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=missions,size=(300, 50),enable_events=True,key="Mission list")]]
-tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills",],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]]
+tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')],[sg.Table(values=tuple_employed_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
 #layout.append([sg.Graph(background_color='gray', graph_bottom_left=(0,0), graph_top_right=(2500, 1250), canvas_size=(2500, 1250),key="fond")])
@@ -513,27 +521,50 @@ def MissionHacking():
             sg.WIN_CLOSED==None
 def MissionPassword():
     global money
+    global selected_options
+    global list_free_employees
     Pswexists = "Password Cracker" in rawtools
     result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
     selected_indices = window["Mission list"].get_indexes()
     pswtext=["recover access to a critical server after the password was lost", "investigate potential insider threats by accessing encrypted files", "retrieve data from a locked device for a legal case", "test the security of their systems against potential breaches", "access an employee's account after they left the company without sharing credentials", "bypass forgotten passwords on essential software", "ensure compliance with cybersecurity regulations by testing password strength", "recover encrypted data after a ransomware attack", "access backup systems when primary credentials fail", "audit and improve password policies by identifying weak points."]
     randompswtext=pswtext[randint(0,len(pswtext)-1)]
     chosenpswtext=randompswtext
+
     if selected_indices:
         chosenmissionnumber = selected_indices[0] 
         chosenmission=missions[chosenmissionnumber]
-        result, selected_options = yes_no_popup_with_listbox(
+        result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
-                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\nReward: 1500.-\nHere you can select the employees you want to send",
+                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{nbremployeesgenerator} or more required\n Danger Level{dangerositygenerator}\nReward: 1500.-\nHere you can select the employees you want to send",
                 list_free_employees,
                 "Do you want to choose this mission?"
             )
         if result == 'Yes':
             if selected_options:
-                sg.popup(f'You Selected those employees: {", ".join(selected_options)}')
+                sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
+
             else:
-                sg.popup('You are going to complete the mission alone because you selected no employees')
-            sg.popup(f'You chose Yes and selected: {", ".join(selected_options)}')
+                sg.popup('You are going to complete the mission alone because you selected no employees',no_titlebar=True)
+                if Pswexists!=True:
+                            if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
+                                sg.WIN_CLOSED==None
+                            else:
+                               result = password_game() 
+                #sg.popup("",no_titlebar=True)
+                if Pswexists==True: 
+                        result = password_game()
+                if result==1:
+                    #sg.popup("GG You won",no_titlebar=True)
+                    money+=1500
+                    window['pippo'].update(f"Money Counter:{money}")
+                    Missionadder()
+                if result==0:
+                    #sg.popup("You lost",no_titlebar=True)
+                    sg.WIN_CLOSED==None
+                    Missionadder()
+                else:               
+                    sg.WIN_CLOSED==None
+            #sg.popup(f'You chose Yes and selected: {", ".join(selected_options)}')
         elif result == 'No':
             sg.WIN_CLOSED==None
             #sg.popup(f'You chose No. Selected options were: {", ".join(selected_options)}')
@@ -617,6 +648,7 @@ while True:                             # Event Loop
             selected_worker = Teamshop[selected_row_index][0]  # Get the data of the selected row and the first column
             selected_skill = Teamshop[selected_row_index][1]
             selected_Motivation = Teamshop[selected_row_index][2]
+            selected_braveness = Teamshop[selected_row_index][3]
             selected_price = Teamshop[selected_row_index][-1]
             if selected_worker in employees_owned:
                 sg.popup("TEST",no_titlebar=True)
@@ -626,9 +658,10 @@ while True:                             # Event Loop
                 if selected_price <= money:
                     if sg.popup_yes_no(f"Do you want to recruit {selected_worker}  for {selected_price}.-?",no_titlebar=True)=="Yes":
                             money-=selected_price                       
-                            employees_owned.update({selected_worker: [selected_skill,selected_Motivation]})
-                            free_employees.update({selected_worker: [selected_skill,selected_Motivation]})
+                            employees_owned.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
+                            free_employees.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
                             tuple_free_employees=tuple(free_employees.items())
+                            tuple_employed_employees=tuple(employed_employees.items())
                             list_free_employees= [f'{key} {value}' for key, value in free_employees.items()]
                             print("list",list_free_employees)
                             print(employees_owned)
