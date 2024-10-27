@@ -7,6 +7,7 @@ import pygame
 import time
 import string
 from random import *
+import threading
 
 # Fonction principale du jeu de hacking
 def hacking_game():#créé avec IA(ChatGpt3.5), je l'ai guidée dans le developpement, la première requête était celle-ci"Code me a game that take the mechanic of hacking and reminds of hacking with a hacking driven graphics, the game should have a 90% win ratio"
@@ -344,25 +345,30 @@ money=0
 mission1won=0
 tools = list(set(rawtools))
 pswcount=0
-employees_owned = {}
+employees_owned = []
+removed_employees = []
 employed_employees ={}
 tuple_employed_employees=[f'{key} {value}' for key, value in employed_employees.items()]
 dictionnary_free_employees = {}
 tuple_free_employees=[f'{key} {value}' for key, value in dictionnary_free_employees.items()]
 list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
+employees_owned_string = [ str(emp) for emp in employees_owned ]
+removed_employees_string = [ str(emp) for emp in removed_employees]
 
 class Mission:
     def __init__(self, name, dangerosity, nb_employees):
         self.name = name
         self.dangerosity = randint(1,3)
-        self.nb_employees = randint(1,4)
+        self.nb_employees = randint(1,1)
         self.missiontype=randint(0, 1)
-class Mission:
-    def __init__(self, name, Skills, Motivation, Braveness):
+class Employee:
+    def __init__(self, name, tool, motivation, braveness):
         self.name = name
-        self.dangerosity = randint(1,3)
-        self.nb_employees = randint(1,4)
-        self.missiontype=randint(0, 1)
+        self.tool = tool
+        self.motivation = motivation
+        self.braveness = braveness
+    def __str__(self):
+        return f"{self.name},{self.tool},{self.motivation},Braveness Level:{self.braveness}"
 
 
 
@@ -465,7 +471,7 @@ def randomMotivationgenerator():
 
     return random_Motivation
 def randombravenessgenerator():
-    braveness=["Indiana Jones","Student","Chicken"] 
+    braveness=[3,2,1] 
     random_braveness = choice(braveness)
 
     return random_braveness
@@ -477,9 +483,23 @@ def randomtoolgenerator():
     return random_tools
 def employeesgenerator():
     return randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),randombravenessgenerator()
+
+def get_emp_object_by_string(emp_string):
+    for emp in employees_owned:
+        if str(emp) == emp_string:
+            return emp
 def reussitemission():
     global selected_options
-    txreussite=((((len(selected_options))/chosennbemployees))*100+((len(selected_options)*chosendangerosity)))
+    total_braveness = 0
+    
+    
+    for emp_string in selected_options:
+        
+        emp = get_emp_object_by_string(emp_string)
+        total_braveness += emp.braveness
+
+    print("total braveness", total_braveness)
+    txreussite=((((0.6*len(selected_options))/chosennbemployees))*100+((len(selected_options)*chosendangerosity)-(total_braveness))*5)
     if randint(1,100) < txreussite:
         resultat="Win"
     else:
@@ -497,12 +517,15 @@ dangerosity = dangerositygenerator()
 nb_employees = nbremployeesgenerator()
 
 
-marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files with equal or lower encryption than the version, by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
+
+marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
 Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
+tuple_free_employees=[*employeesgenerator(),10000],[*employeesgenerator(),10000]
+tuple_free_employees=[]
 missions=[]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=[mission.name for mission in missions],size=(300, 50),enable_events=True,key="Mission list")]]
-tab_layout2 = [[sg.Text(f"Team: {employees_owned}",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')],[sg.Table(values=tuple_employed_employees, headings=["Name", "Skills"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=False,col_widths=[20,40],max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Employees')]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
+tab_layout2 = [[sg.Text(f"Here are all your employees that are available:",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills","Motivation","Level of Braveness"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=100,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Level of Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))], [sg.Button("Free money")] ]
 layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3),sg.Tab("User", tab_layout4)]])])
@@ -543,7 +566,7 @@ def MissionPassword():
     global money
     global selected_options
     global list_free_employees
-    global chosenmissionnumber,chosenmission,chosendangerosity,chosennbemployees
+    global chosenmissionnumber,chosenmission,chosendangerosity,chosennbemployees,employees_owned_string
     Pswexists = "Password Cracker" in rawtools
     result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
     selected_indices = window["Mission list"].get_indexes()
@@ -556,25 +579,25 @@ def MissionPassword():
         chosenmission=selected_mission.name
         chosendangerosity=selected_mission.dangerosity
         chosennbemployees=selected_mission.nb_employees
+        employees_owned_string = [ str(emp) for emp in employees_owned ]
         result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
                 f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: 1500.-\n Here you can select the employees you want to send",
-                list_free_employees,
+                employees_owned_string,
                 "Do you want to choose this mission?"
             )
         if result == 'Yes':
             if selected_options:
                 if len(selected_options) >= chosennbemployees and len(selected_options)!=0:
                     sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
-                    tuple_selected_options=tuple(selected_options)
-                    print(tuple_selected_options)
                     resultat=reussitemission()
-                    if reussitemission=="Win":
+                    if resultat=="Win":
                         money+=1500
                         window['pippo'].update(f"Money Counter:{money}")
+                        sg.popup(f'You completed the mission with success\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back',no_titlebar=True)
                         Missionadder()
-                    if reussitemission=="Lose":
-                        
+                    if resultat=="Lose":
+                        sg.popup(f'You failed the mission\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back ',no_titlebar=True)
                         Missionadder()
 
                 if len(selected_options) < chosennbemployees:
@@ -630,14 +653,13 @@ def MissionPassword():
                             sg.WIN_CLOSED==None
         else:               
             sg.WIN_CLOSED==None"""
-sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
+#sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
 sleep(0.2)
-sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Your first mission] button for a little check",no_titlebar=True,font="Default 20")
+#sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Your first mission] button for a little check",no_titlebar=True,font="Default 20")
 event, values = window.read()
 
-#print(event, values)
-while True:                             # Event Loop
-    event, values = window.read()       # type: str, dict
+while True:                             
+    event, values = window.read()       
     #print(event,values)
     Pswexists = "Password Cracker" in rawtools
     Decexists = "Decrypter" in rawtools
@@ -696,17 +718,17 @@ while True:                             # Event Loop
                     sg.popup("You don't have enough money to recruit him.",no_titlebar=True)
                 if selected_price <= money:
                     if sg.popup_yes_no(f"Do you want to recruit {selected_worker}  for {selected_price}.-?",no_titlebar=True)=="Yes":
-                            money-=selected_price                       
-                            employees_owned.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
-                            dictionnary_free_employees.update({selected_worker: [selected_skill,selected_Motivation,selected_braveness]})
-                            tuple_free_employees=tuple(dictionnary_free_employees.items())
-                            tuple_employed_employees=tuple(employed_employees.items())
-                            list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employees.items()]
-                            #print("list",list_free_employees)
-                            #print(employees_owned)
-                            #print(tuple_free_employees)
-                            window['TEAM'].update(f"Team: {employees_owned}")
-                            window['Employees'].update(tuple_free_employees)
+                            money-=selected_price
+                            name=selected_worker
+                            tool=selected_skill 
+                            motivation=selected_Motivation
+                            braveness=selected_braveness  
+                            employee = Employee(name, tool, motivation, braveness)
+                            employees_owned.append(employee)
+                            tuple_free_employees=tuple_free_employees+([[selected_worker,selected_skill,selected_Motivation,selected_braveness]])
+                            employees_owned_string = [ str(emp) for emp in employees_owned ]
+                            print(tuple_free_employees) 
+                            window['freeemployees'].update(tuple_free_employees)
                             Teamshop=()
                             Teamshop=([*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000])
                             window['WORKERSHOP'].update(Teamshop)
