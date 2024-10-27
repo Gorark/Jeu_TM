@@ -8,11 +8,10 @@ import time
 import string
 import datetime
 from random import *
-import threading
 
 # CONSTANTS
 
-EMPLOYEE_TIMEOUT_SECONDS=30
+EMPLOYEE_TIMEOUT_SECONDS=120
 
 # Fonction principale du jeu de hacking
 def hacking_game():#créé avec IA(ChatGpt3.5), je l'ai guidée dans le developpement, la première requête était celle-ci"Code me a game that take the mechanic of hacking and reminds of hacking with a hacking driven graphics, the game should have a 90% win ratio"
@@ -346,7 +345,7 @@ def password_game(): #créé avec IA,(ChatGpt3.5) avec cette commande"Create a h
 
 
 rawtools=[]
-money=0
+money=1000
 mission1won=0
 tools = list(set(rawtools))
 pswcount=0
@@ -360,29 +359,31 @@ list_free_employees= [f'{key} {value}' for key, value in dictionnary_free_employ
 employees_owned_string = [ str(emp) for emp in employees_owned ]
 removed_employees_string = [ str(emp) for emp in removed_employees]
 tools=["Password Cracker","Decrypter","Firewall Bypass","Log Eraser"] 
-
+Pswexists = "Password Cracker" in rawtools
+Decexists = "Decrypter" in rawtools
+Fireexists = "Firewall Bypass" in rawtools
+IPexists = "Log Eraser" in rawtools
 class Mission:
-    def __init__(self, name, dangerosity, nb_employees):
+    def __init__(self, name):
         self.name = name
         self.dangerosity = randint(1,3)
-        self.nb_employees = randint(1,4)
+        self.nb_employees = randint(1, min(4, len(tools)))
         self.missiontype=randint(0, 1)
-        #self.toolsrequired=randomtoolsnumber()
+        self.toolsrequired=randomtoolsnumber(self.nb_employees)
 class Employee:
-    def __init__(self, name, tool, motivation, braveness):
+    def __init__(self, name, tool,  braveness):
         self.name = name
         self.tool = tool
-        self.motivation = motivation
         self.braveness = braveness
         self.last_used = None
 
     def __str__(self):
-        return f"{self.name},{self.tool},{self.motivation},Braveness Level:{self.braveness}"
+        return f"{self.name},{self.tool},Braveness Level:{self.braveness}"
 
     def use(self):
         self.last_used = datetime.datetime.now()
         available_employee = self.last_used + datetime.timedelta(seconds=EMPLOYEE_TIMEOUT_SECONDS)
-        print (f"Unavailable employee {self.name} until {available_employee}")
+        sg.popup(f"Unavailable employee {self.name} until {available_employee}",no_titlebar=True)
 
     def is_available(self):
         if self.last_used == None:
@@ -403,8 +404,8 @@ def MissionNames():
 
 
 def MissionChooser(n):
-    #Missiontypes = [1, 2]
-    #n = randint(0, 1)
+    Missiontypes = [1, 2]
+    n = randint(0, 1)
     if n == 0:
         Missionchoosen = MissionHacking()
     elif n == 1:
@@ -414,13 +415,11 @@ def Missionadder():
     missions.clear()
     for i in range(5):
         mission_name = MissionNames()
-        mission = Mission(mission_name, dangerosity, nb_employees)
+        mission = Mission(mission_name)
         missions.append(mission)
-    #print([mission.name for mission in missions])
-    #print(missions)
     event, values = window.read()
     window['Mission list'].update(values=[mission.name for mission in missions])
-def yes_no_popup_with_listbox(title, message, options,message2, default_values=None):
+def yes_no_popup_listbox(title, message, options,message2, default_values=None):
     if default_values is None:
         default_values = []
     layout = [
@@ -442,40 +441,8 @@ def yes_no_popup_with_listbox(title, message, options,message2, default_values=N
         elif event in ('Yes', 'No'):
             result = (event, values['LIST'])
             break
-    
     window.close()
     return result
-def progressbar():
-    # Layout the form
-    newlayout = [[sg.Text('Energy')],
-              [sg.ProgressBar(100000, orientation='h', size=(20, 20), key='progress')],
-              [sg.Button("Pay")]]
-
-    # Create the window
-    newwindow = sg.Window('Custom Progress Meter', layout)
-    progress_bar = window['progress']
-    current_value = 0
-
-    # Event loop
-    while True:
-        event, values = window.read(timeout=10)
-        
-        if event == sg.WIN_CLOSED:
-            break
-        
-        if event == 'Pay':
-            current_value = max(0, current_value - 30000)
-        else:
-            current_value = min(10000, current_value + 10)
-        
-        progress_bar.update(current_value)
-        
-        if current_value == 10000:
-            break
-
-    # Close the window when done
-    window.close()
-
 def randomnamegenerator():
     first_names = ['John', 'Emma', 'Michael', 'Sophia', 'William', 'Olivia', 'James', 'Ava', 'Robert', 'Isabella', 
                 'David', 'Mia', 'Joseph', 'Charlotte', 'Daniel', 'Amelia', 'Thomas', 'Harper', 'Christopher', 'Evelyn']
@@ -488,11 +455,6 @@ def randomnamegenerator():
 
     rdmname = f"{random_first_name} {random_last_name}"
     return rdmname
-def randomMotivationgenerator():
-    Motivation = ["Grinder","Normal Worker","ChatGPT User"]
-    random_Motivation = choice(Motivation)
-
-    return random_Motivation
 def randombravenessgenerator():
     braveness=[3,2,1] 
     random_braveness = choice(braveness)
@@ -502,18 +464,25 @@ def randomtoolgenerator():
     tools=["Password Cracker","Decrypter","Firewall Bypass","Log Eraser"] 
     random_tools = choice(tools)
     return random_tools 
-"""def randomtoolsnumber():
-    chosennbemployees = min(chosennbemployees, len(tools))
-    # Use random.sample to select n unique elements from the tools list
-    selected_tools = random.sample(tools, chosennbemployees)
-    return selected_tools"""    
+def randomtoolsnumber(chosennbemployees):
+        selected_tools = sample(tools, chosennbemployees)
+        return selected_tools 
+
 def employeesgenerator():
-    return randomnamegenerator(),randomtoolgenerator(),randomMotivationgenerator(),randombravenessgenerator()
+    bravenessnew=randombravenessgenerator()
+    employees_price=10000+(bravenessnew*2500)
+    return randomnamegenerator(),randomtoolgenerator(),bravenessnew,employees_price
 
 def get_emp_object_by_string(emp_string):
     for emp in employees_owned:
         if str(emp) == emp_string:
             return emp
+def get_mis_object_by_string(mis_string):
+    for mis in missions:
+        if mis.toolsrequired == mis_string:
+            return mis
+        
+
 def reussitemission():
     global selected_options
     total_braveness = 0
@@ -544,13 +513,11 @@ nb_employees = nbremployeesgenerator()
 
 
 marketdata = (["Password Cracker","Cracks Passwords",1000], ["Decrypter","Decrypt files by clicking on them. ",5000], ["Firewall Bypass","Bypass the firewall",2500], ["Log Eraser","Erase the logs",10000])   
-Teamshop=[*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000]
-tuple_free_employees=[*employeesgenerator(),10000],[*employeesgenerator(),10000]
-tuple_free_employees=[]
+Teamshop=[*employeesgenerator()],[*employeesgenerator()],[*employeesgenerator()]
 missions=[]
 tab_layout1 = [[sg.Text("Choose your Mission:")],[sg.Listbox(values=[mission.name for mission in missions],size=(300, 50),enable_events=True,key="Mission list")]]
-tab_layout2 = [[sg.Text(f"Here are all your employees that are available:",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills","Motivation","Level of Braveness"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')]]
-tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Motivation","Level of Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
+tab_layout2 = [[sg.Text(f"Here are all your employees :",key="TEAM", font=("Calibri", 24))],[sg.Table(values=tuple_free_employees, headings=["Name", "Skills","Level of Braveness"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='freeemployees')]]
+tab_layout3 = [[sg.Text("Buy your favourites tools")],[sg.Table(values=marketdata, headings=["Tools", "Details", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='Market')],[sg.Text("Buy Workers for your Entreprise!")],[sg.Table(values=Teamshop, headings=["Name", "Skills","Level of Braveness", "Price"],enable_events=True,hide_vertical_scroll=True,auto_size_columns=True,max_col_width=70,enable_click_events=True,justification='l',select_mode=sg.TABLE_SELECT_MODE_BROWSE,key='WORKERSHOP')]] #besoin d'une tuple pas d'une liste
 tab_layout4 = [[sg.Text(f"Tools Owned: {tools}",key="-TOOLS-", font=("Calibri", 24))]]
 layout = [[sg.Titlebar("CyberOps Entreprises")],[sg.Text(f"Money Counter: {money}",key="pippo", font=("Calibri", 24))]]
 layout.append([sg.TabGroup([[sg.Tab("Mission", tab_layout1), sg.Tab("Team", tab_layout2),sg.Tab("Market", tab_layout3),sg.Tab("User", tab_layout4)]]), [sg.Button("Free money")] ])
@@ -558,35 +525,8 @@ window = sg.Window('CyberOps Entreprises', layout, finalize=True)
 Missionadder()
 selected_indices = window["Mission list"].get_indexes()
 if selected_indices:
-    chosenmission = selected_indices[0] 
-def MissionHacking():
-    global selected_indices
-    global money
-    Pswexists = "Password Cracker" in rawtools
-    result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
-    selected_indices = window["Mission list"].get_indexes()
-    moneyreward=50
-    if selected_indices:
-        chosenmissionnumber = selected_indices[0] 
-        chosenmission=missions[chosenmissionnumber]
-        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\nInfiltrate a competitor's computer system and sabotage their files.\nHack into a computer and delete key files.\nLocate and destroy crucial data on a main system.\nRequired Tools: Password Cracker\nReward: {moneyreward}.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
-                        if Pswexists!=True:
-                            if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
-                                sg.WIN_CLOSED==None
-                        sg.popup("Now you will start the hacking those are the rules ",no_titlebar=True)
-                        sg.popup(f"{Hack_Rules}",no_titlebar=True)
-                        result = hacking_game()
-                        if result==1:
-                            sg.popup("You completed the mission with success.\nTake your money reward.",no_titlebar=True)
-                            money+=moneyreward
-                            window['pippo'].update(f"Money Counter:{money}")
-                            Missionadder()
-                        if result==0:
-                            sg.popup("You lost",no_titlebar=True)
-                            sg.WIN_CLOSED==None
-                            Missionadder()
-        else:               
-            sg.WIN_CLOSED==None
+    chosenmission = selected_indices[0]
+
 def MissionHacking():
     global money
     global selected_options
@@ -604,57 +544,71 @@ def MissionHacking():
         chosenmission=selected_mission.name
         chosendangerosity=selected_mission.dangerosity
         chosennbemployees=selected_mission.nb_employees
+        chosentoolsrequired=selected_mission.toolsrequired
+        chosentools_string = ",".join(chosentoolsrequired)
         moneyreward=int(2000*chosennbemployees*chosendangerosity*0.3)
         employees_owned_available = []
         for employee_owned_elem in employees_owned:
             if employee_owned_elem.is_available():
                 employees_owned_available.append(employee_owned_elem)
-        employees_owned_string = [ str(emp) for emp in employees_owned_available ]
-        result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
+        employees_owned_string = [ str(emp) for emp in employees_owned_available]
+        result, selected_options = yes_no_popup_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
-                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: {moneyreward}.-\n Here you can select the employees you want to send",
+                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: {chosentools_string}\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: {moneyreward}.-\n Here you can select the employees you want to send",
                 employees_owned_string,
                 "Do you want to choose this mission?"
             )
         if result == 'Yes':
             if selected_options:
                 if len(selected_options) >= chosennbemployees and len(selected_options)!=0:
-                    sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
+                    chosentoolsrequired_temp = chosentoolsrequired
+                    for tool in chosentoolsrequired:
+                        for emp_str in selected_options:
+                            if get_emp_object_by_string(emp_str).tool in chosentoolsrequired_temp:
+                                chosentoolsrequired_temp.remove(get_emp_object_by_string(emp_str).tool)
+                    if len(chosentoolsrequired_temp) == 0:
+                        print("we have all tools")
+                        sg.popup(f'You Selected those employees and they have the required tools: {", ".join(selected_options)}',no_titlebar=True)
+                        resultat=reussitemission()
+                    sg.popup(f'You Selected those employees and they have the required tools: {", ".join(selected_options)}',no_titlebar=True)
                     resultat=reussitemission()
                     if resultat=="Win":
-                        money+=1500
+                        money+=moneyreward
                         window['pippo'].update(f"Money Counter:{money}")
                         sg.popup(f'You completed the mission with success\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back',no_titlebar=True)
                         Missionadder()
                     if resultat=="Lose":
-                        sg.popup(f'You failed the mission\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back ',no_titlebar=True)
+                        sg.popup(f'You failed the mission\n The employees you sent will be unavailable for 2 minutes,',no_titlebar=True)
+                        money-=moneyreward*2
+                        window['pippo'].update(f"Money Counter:{money}")
                         Missionadder()
                     for emp_str in selected_options:
                         get_emp_object_by_string(emp_str).use()
+                    else:
+                        sg.popup("You miss these tools:", ",".join(chosentoolsrequired_temp))
+                        sg.WIN_CLOSED==None
 
                 if len(selected_options) < chosennbemployees:
                     sg.popup("You did not select enough employees")
                     sg.WIN_CLOSED==None
             else:
                 sg.popup('You are going to complete the mission alone because you selected no employees',no_titlebar=True)
-                if Pswexists!=True:
-                    if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
-                        sg.WIN_CLOSED==None
-                    sg.popup("Now you will start the hacking those are the rules ",no_titlebar=True)
-                    sg.popup(f"{Hack_Rules}",no_titlebar=True)
-                    result = hacking_game()
-                    if result==1:
-                        sg.popup("You completed the mission with success.\nTake your money reward.",no_titlebar=True)
-                        money+=moneyreward
-                        window['pippo'].update(f"Money Counter:{money}")
-                        Missionadder()
-                    if result==0:
-                        sg.popup("You lost",no_titlebar=True)
-                        sg.WIN_CLOSED==None
-                        Missionadder()
+                sg.popup("Now you will start the hacking those are the rules ",no_titlebar=True)
+                sg.popup(f"{Hack_Rules}",no_titlebar=True)
+                result = hacking_game()
+                if result==1:
+                    sg.popup("You completed the mission with success.\nTake your money reward.",no_titlebar=True)
+                    money+=moneyreward
+                    window['pippo'].update(f"Money Counter:{money}")
+                    Missionadder()
+                if result==0:
+                    sg.popup("You failed the mission",no_titlebar=True)
+                    money-=moneyreward*2
+                    window['pippo'].update(f"Money Counter:{money}")
+                    sg.WIN_CLOSED==None
+                    Missionadder()
         elif result == 'No':
             sg.WIN_CLOSED==None
-
 def MissionPassword():
     global money
     global selected_options
@@ -663,7 +617,6 @@ def MissionPassword():
     Pswexists = "Password Cracker" in rawtools
     result=150 #pour éviter de faire bugger le result on le defini avec une valeur au pif
     selected_indices = window["Mission list"].get_indexes()
-
     pswtext=["recover access to a critical server after the password was lost", "investigate potential insider threats by accessing encrypted files", "retrieve data from a locked device for a legal case", "test the security of their systems against potential breaches", "access an employee's account after they left the company without sharing credentials", "bypass forgotten passwords on essential software", "ensure compliance with cybersecurity regulations by testing password strength", "recover encrypted data after a ransomware attack", "access backup systems when primary credentials fail", "audit and improve password policies by identifying weak points."]
     randompswtext=pswtext[randint(0,len(pswtext)-1)]
     chosenpswtext=randompswtext
@@ -673,31 +626,46 @@ def MissionPassword():
         chosenmission=selected_mission.name
         chosendangerosity=selected_mission.dangerosity
         chosennbemployees=selected_mission.nb_employees
-        moneyreward=int(2000*chosennbemployees*chosendangerosity*0.1)
+        chosentoolsrequired=selected_mission.toolsrequired
+        chosentools_string = ",".join(chosentoolsrequired)
+        moneyreward=int(2000*chosennbemployees*chosendangerosity*0.3)
+        pswrequired=["Password Cracker"]
         employees_owned_available = []
         for employee_owned_elem in employees_owned:
             if employee_owned_elem.is_available():
                 employees_owned_available.append(employee_owned_elem)
-
-        employees_owned_string = [ str(emp) for emp in employees_owned_available ]
-        result, selected_options = yes_no_popup_with_listbox(#besoin d'une liste pas d'un tuple
+        employees_owned_string = [ str(emp) for emp in employees_owned_available]
+        result, selected_options = yes_no_popup_listbox(#besoin d'une liste pas d'un tuple
                 'Mission Mail',
-                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: {moneyreward}.-\n Here you can select the employees you want to send",
+                f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: {pswrequired}\n{chosennbemployees} or more employees required\n Danger Level {chosendangerosity}\n Reward: {moneyreward}.-\n Here you can select the employees you want to send",
                 employees_owned_string,
                 "Do you want to choose this mission?"
             )
         if result == 'Yes':
             if selected_options:
                 if len(selected_options) >= chosennbemployees and len(selected_options)!=0:
-                    sg.popup(f'You Selected those employees: {", ".join(selected_options)}',no_titlebar=True)
+                    chosentoolsrequired_temp = chosentoolsrequired
+                    for tool in pswrequired:
+                        for emp_str in selected_options:
+                            if get_emp_object_by_string(emp_str).tool in pswrequired:
+                                pswrequired.remove(get_emp_object_by_string(emp_str).tool)
+                    if len(pswrequired) == 0:
+                        print("we have all tools")
+                    else:
+                        sg.popup("You miss these tools:", ",".join(pswrequired))
+                        sg.WIN_CLOSED==None
+
+                    sg.popup(f'You Selected those employees and they have the required tools: {", ".join(selected_options)}',no_titlebar=True)
                     resultat=reussitemission()
                     if resultat=="Win":
-                        money+=1500
+                        money+=moneyreward
                         window['pippo'].update(f"Money Counter:{money}")
                         sg.popup(f'You completed the mission with success\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back',no_titlebar=True)
                         Missionadder()
                     if resultat=="Lose":
-                        sg.popup(f'You failed the mission\n The employees you sent will be unavailable for 2 minutes, you will receive a pop-up when they are back ',no_titlebar=True)
+                        sg.popup(f'You failed the mission\n The employees you sent will be unavailable for 2 minutes,',no_titlebar=True)
+                        money-=moneyreward*2
+                        window['pippo'].update(f"Money Counter:{money}")
                         Missionadder()
                     for emp_str in selected_options:
                         get_emp_object_by_string(emp_str).use()
@@ -705,59 +673,51 @@ def MissionPassword():
                 if len(selected_options) < chosennbemployees:
                     sg.popup("You did not select enough employees")
                     sg.WIN_CLOSED==None
-
-
             else:
                 sg.popup('You are going to complete the mission alone because you selected no employees',no_titlebar=True)
+                if Pswexists==True: 
+                    result = password_game()
+                    if result==1:
+                        sg.popup("You completed the mission with success",no_titlebar=True)
+                        money+=moneyreward
+                        
+                        window['pippo'].update(f"Money Counter:{money}")
+                        Missionadder()
+                    if result==0:
+                        sg.popup("You failed the mission",no_titlebar=True)
+                        money-=moneyreward*2
+                        window['pippo'].update(f"Money Counter:{money}")
+                        sg.WIN_CLOSED==None
+                        Missionadder()
+                    else:               
+                        sg.WIN_CLOSED==None 
                 if Pswexists!=True:
                             if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
                                 sg.WIN_CLOSED==None
                             else:
-                               result = password_game() 
-                #sg.popup("",no_titlebar=True)
-                if Pswexists==True: 
-                        result = password_game()
-                if result==1:
-                    #sg.popup("GG You won",no_titlebar=True)
-                    money+=1500
-                    window['pippo'].update(f"Money Counter:{money}")
-                    Missionadder()
-                if result==0:
-                    #sg.popup("You lost",no_titlebar=True)
-                    sg.WIN_CLOSED==None
-                    Missionadder()
-                else:               
-                    sg.WIN_CLOSED==None
-            #sg.popup(f'You chose Yes and selected: {", ".join(selected_options)}')
+                                result = password_game()
+                                if result==1:
+                                    sg.popup("You completed the mission with success",no_titlebar=True)
+                                    money+=moneyreward
+                                    
+                                    window['pippo'].update(f"Money Counter:{money}")
+                                    Missionadder()
+                                if result==0:
+                                    sg.popup("You failed the mission",no_titlebar=True)
+                                    money-=moneyreward*2
+                                    window['pippo'].update(f"Money Counter:{money}")
+                                    sg.WIN_CLOSED==None
+                                    Missionadder()
+                                else:             
+                                    sg.WIN_CLOSED==None  
+                               
+                        
         elif result == 'No':
             sg.WIN_CLOSED==None
-            #sg.popup(f'You chose No. Selected options were: {", ".join(selected_options)}')
-        """    
-        if sg.popup_yes_no(f"You have selected the mail from {chosenmission}\nThe speech is as follows:\n{chosenpswtext}\nRequired Tools: Password Cracker\nReward: 1500.-\nDo you want to choose this mission?",no_titlebar=True)=="Yes":
-                        if Pswexists!=True:
-                            if sg.popup_yes_no(f"Watch out, you don't have the Password Cracker, the mission could be harder do you still want to continue?",no_titlebar=True)=="No":
-                                sg.WIN_CLOSED==None
-                            else:
-                               result = password_game() 
-                        #sg.popup("",no_titlebar=True)
-                        if Pswexists==True: 
-                             result = password_game()
-                        if result==1:
-                            #sg.popup("GG You won",no_titlebar=True)
-                            money+=1500
-                            window['pippo'].update(f"Money Counter:{money}")
-                            Missionadder()
-                        if result==0:
-                            #sg.popup("You lost",no_titlebar=True)
-                            sg.WIN_CLOSED==None
-                            Missionadder()
-                        else:               
-                            sg.WIN_CLOSED==None
-        else:               
-            sg.WIN_CLOSED==None"""
-#sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
+sg.Popup("Welcome to CyberOps Entreprises.",no_titlebar=True,font="Default 20")
+
 sleep(0.2)
-#sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Missions] tab and press the [Your first mission] button for a little check",no_titlebar=True,font="Default 20")
+sg.Popup("You are probably confused we're going to show you around don't worry\n\nFirst head to the [Market] to buy your first tool",no_titlebar=True,font="Default 20")
 event, values = window.read()
 
 while True:                             
@@ -772,11 +732,11 @@ while True:
         window['pippo'].update(f"Money Counter:{money}")
 
         print(money)
-    if event in (sg.WIN_CLOSED, '-EXIT-'):         # If the user exits
+    if event in (sg.WIN_CLOSED, '-EXIT-'):         
         break
     if event == 'Market':
-        selected_row_index = values['Market'][0]  # Get the index of the selected row 
-        selected_tool = marketdata[selected_row_index][0]  # Get the data of the selected row and the first column
+        selected_row_index = values['Market'][0]  # Donne l' index de la ligne séléctionnée
+        selected_tool = marketdata[selected_row_index][0]  # Donne les données de la ligne et de la première colonne selectionnées 
         selected_price = marketdata[selected_row_index][-1]
         if selected_tool in rawtools:
             sg.popup("You already bought that tool.",no_titlebar=True)
@@ -791,15 +751,10 @@ while True:
                         window['-TOOLS-'].update(f"Tools Owned: {tools}")
                         window['pippo'].update(f"Money Counter:{money}")
                         Pswexists = "Password Cracker" in rawtools
-                        Decexists = "Decrypter" in rawtools
-                        Fireexists = "Firewall Bypass" in rawtools
-                        IPexists = "Log Eraser" in rawtools
-                        #marketdata.remove(selected_row_index)
-
                         
                         sg.popup(f"You successfully bought the {selected_tool}",no_titlebar=True)
                         if Pswexists==True and pswcount==0:
-                            sg.popup("Now let's go try your first true mission with this tool.\n Head to [Missions] and choose one",no_titlebar=True,font="Default 20")
+                            sg.popup("The tools are a way of completing mission, if you do not own the tools required in the mission mail you won't be able to complete it\nNow let's go try your first true mission with this tool.\n Head to [Missions] and choose one that requires the Password Cracker only",no_titlebar=True,font="Default 20")
                             pswcount+=1
                         
                 sg.WIN_CLOSED==None
@@ -807,14 +762,13 @@ while True:
         if len(values["WORKERSHOP"]) == 0:#évite un index out of range
             sleep(0.5)
         else:
-            selected_row_index = values["WORKERSHOP"][0]  # Get the index of the selected row 
-            selected_worker = Teamshop[selected_row_index][0]  # Get the data of the selected row and the first column
+            selected_row_index = values["WORKERSHOP"][0]  
+            selected_worker = Teamshop[selected_row_index][0] 
             selected_skill = Teamshop[selected_row_index][1]
-            selected_Motivation = Teamshop[selected_row_index][2]
-            selected_braveness = Teamshop[selected_row_index][3]
+            selected_braveness = Teamshop[selected_row_index][2]
             selected_price = Teamshop[selected_row_index][-1]
             if selected_worker in employees_owned:
-                sg.popup("TEST",no_titlebar=True)
+                sg.popup("Easter EGG",no_titlebar=True)
             else:
                 if selected_price > money:
                     sg.popup("You don't have enough money to recruit him.",no_titlebar=True)
@@ -823,11 +777,10 @@ while True:
                             money-=selected_price
                             name=selected_worker
                             tool=selected_skill 
-                            motivation=selected_Motivation
                             braveness=selected_braveness  
-                            employee = Employee(name, tool, motivation, braveness)
+                            employee = Employee(name, tool,braveness)
                             employees_owned.append(employee)
-                            tuple_free_employees=tuple_free_employees+([[selected_worker,selected_skill,selected_Motivation,selected_braveness]])
+                            tuple_free_employees=tuple_free_employees+([[selected_worker,selected_skill,selected_braveness]])
                             employees_owned_string = [ str(emp) for emp in employees_owned ]
                             print(tuple_free_employees) 
                             window['freeemployees'].update(tuple_free_employees)
@@ -835,7 +788,9 @@ while True:
                             Teamshop=([*employeesgenerator(),10000],[*employeesgenerator(),10000],[*employeesgenerator(),10000])
                             window['WORKERSHOP'].update(Teamshop)
                             window['pippo'].update(f"Money Counter:{money}")
-                            sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)       
+                            sg.popup(f"You successfully recruited {selected_worker}",no_titlebar=True)
+                            if len(employees_owned)==1:
+                                sg.popup(f"You successfully recruited your first employee!\nYou can use them to complete missions, as you might have noticed they have different tools and Braveness levels.\nKeep that in mind when you are sending them into a mission and watch out for the required number of employees too!",no_titlebar=True,font="Default 20")       
                     sg.WIN_CLOSED==None
         
 
